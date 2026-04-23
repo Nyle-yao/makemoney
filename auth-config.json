@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "password_hash": "a7557a3981814c696b433b1001b1a910ef196759d2630bd551d87e35ed1422c6",
+  "title": "量化看板静态展示访问",
+  "hint": "请输入对外展示访问口令",
+  "mode": "client_hash_gate",
+  "security_note": "静态前端口令只适合受控分享；强保护请使用 Cloudflare Access / Vercel / 私有 Pages。"
+}

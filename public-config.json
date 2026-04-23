@@ -1,0 +1,53 @@
+{
+  "site_title": "量化看板静态展示站",
+  "default_route": "sector-board",
+  "enabled_routes": [
+    "fund-board",
+    "fund-dual-momentum-board",
+    "fund-yield-board",
+    "fund-universe",
+    "stock-board",
+    "stock-yield-board",
+    "us-stock-board",
+    "sector-board",
+    "delivery-log"
+  ],
+  "boards": {
+    "fund-board": {
+      "label": "基金主台",
+      "description": "基金组合决策台"
+    },
+    "fund-dual-momentum-board": {
+      "label": "双动量独立台",
+      "description": "基金双动量轮动"
+    },
+    "fund-yield-board": {
+      "label": "基金高收益台",
+      "description": "基金高收益进攻观察"
+    },
+    "fund-universe": {
+      "label": "全市场基金池",
+      "description": "全市场基金池快照"
+    },
+    "stock-board": {
+      "label": "股票主台",
+      "description": "股票多策略决策台"
+    },
+    "stock-yield-board": {
+      "label": "股票高收益台",
+      "description": "股票高收益突破观察"
+    },
+    "us-stock-board": {
+      "label": "美股观察台",
+      "description": "美股量化观察"
+    },
+    "sector-board": {
+      "label": "易总行业量化",
+      "description": "板块风向标与未来22个交易日观察信号"
+    },
+    "delivery-log": {
+      "label": "交付说明台",
+      "description": "项目交付说明"
+    }
+  }
+}

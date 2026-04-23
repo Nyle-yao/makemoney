@@ -1,0 +1,2216 @@
+{
+  "meta": {
+    "generated_at": "2026-04-23 16:59:31",
+    "data_source": "Yahoo Finance public chart API + local CSV cache",
+    "coverage": "22/22",
+    "sources": {
+      "local_cache": 22
+    },
+    "cache_dir": "/Users/nylemorningstar/c/quant_ifind/data_cache/us_stocks/daily"
+  },
+  "hero": {
+    "title": "美股观察台",
+    "action": "进攻观察",
+    "headline": "当前强势/趋势标的 14 只，优先观察：AVGO, SOXX, AMD, TSM, SMH。",
+    "summary": "日线版先做趋势和风险定位，不等同于交易指令；后续可接入分钟级或付费实时源提升盘中执行能力。",
+    "top_symbols": [
+      "AVGO",
+      "SOXX",
+      "AMD",
+      "TSM",
+      "SMH"
+    ]
+  },
+  "stats": {
+    "universe_count": 22,
+    "loaded_count": 22,
+    "attack_count": 14,
+    "defense_count": 2,
+    "failure_count": 0,
+    "avg_score": 79.6
+  },
+  "strategy": {
+    "name": "美股趋势-回撤观察模型 v1",
+    "factors": [
+      "20/60/120日均线结构",
+      "1月/3月/6月动量",
+      "近一年与五年最大回撤",
+      "20日年化波动",
+      "资产分组与防守资产识别"
+    ],
+    "rules": [
+      "强势进攻：评分高且价格站上60日线，适合加入观察池。",
+      "趋势持有：中高评分且趋势未破，适合继续跟踪。",
+      "观察等待：结构未完全转强，不追高。",
+      "防守/不追：趋势或回撤压力较大，先降低交易冲动。"
+    ]
+  },
+  "rows": [
+    {
+      "symbol": "AVGO",
+      "name": "博通",
+      "group": "AI/算力",
+      "role": "AI网络与定制芯片",
+      "as_of": "2026-04-22",
+      "latest": 422.65,
+      "return_1m_pct": 31.05,
+      "return_3m_pct": 28.81,
+      "return_6m_pct": 21.51,
+      "return_1y_pct": 156.35,
+      "return_3y_pct": 601.05,
+      "return_5y_pct": 873.23,
+      "max_drawdown_1y_pct": -28.67,
+      "max_drawdown_5y_pct": -41.15,
+      "ma20": 353.6,
+      "ma60": 335.95,
+      "ma120": 345.7,
+      "mom20_pct": 32.79,
+      "mom60_pct": 30.38,
+      "mom120_pct": 13.78,
+      "vol20_annual_pct": 45.25,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "SOXX",
+      "name": "iShares 半导体 ETF",
+      "group": "半导体",
+      "role": "半导体分散篮子",
+      "as_of": "2026-04-22",
+      "latest": 431.77,
+      "return_1m_pct": 28.28,
+      "return_3m_pct": 24.1,
+      "return_6m_pct": 47.68,
+      "return_1y_pct": 165.54,
+      "return_3y_pct": 212.59,
+      "return_5y_pct": 203.95,
+      "max_drawdown_1y_pct": -15.77,
+      "max_drawdown_5y_pct": -45.75,
+      "ma20": 371.49,
+      "ma60": 354.64,
+      "ma120": 330.84,
+      "mom20_pct": 26.61,
+      "mom60_pct": 25.93,
+      "mom120_pct": 42.11,
+      "vol20_annual_pct": 42.68,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "AMD",
+      "name": "AMD",
+      "group": "AI/算力",
+      "role": "AI芯片弹性",
+      "as_of": "2026-04-22",
+      "latest": 303.46,
+      "return_1m_pct": 49.72,
+      "return_3m_pct": 21.48,
+      "return_6m_pct": 26.15,
+      "return_1y_pct": 254.68,
+      "return_3y_pct": 237.67,
+      "return_5y_pct": 265.57,
+      "max_drawdown_1y_pct": -27.76,
+      "max_drawdown_5y_pct": -65.45,
+      "ma20": 239.4,
+      "ma60": 219.2,
+      "ma120": 222.58,
+      "mom20_pct": 47.76,
+      "mom60_pct": 20.75,
+      "mom120_pct": 17.62,
+      "vol20_annual_pct": 57.04,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "TSM",
+      "name": "台积电 ADR",
+      "group": "半导体",
+      "role": "先进制程",
+      "as_of": "2026-04-22",
+      "latest": 387.44,
+      "return_1m_pct": 14.47,
+      "return_3m_pct": 19.14,
+      "return_6m_pct": 30.86,
+      "return_1y_pct": 165.28,
+      "return_3y_pct": 360.27,
+      "return_5y_pct": 255.67,
+      "max_drawdown_1y_pct": -18.14,
+      "max_drawdown_5y_pct": -56.47,
+      "ma20": 355.24,
+      "ma60": 352.59,
+      "ma120": 326.64,
+      "mom20_pct": 12.87,
+      "mom60_pct": 16.78,
+      "mom120_pct": 29.2,
+      "vol20_annual_pct": 48.99,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "SMH",
+      "name": "VanEck 半导体 ETF",
+      "group": "半导体",
+      "role": "芯片产业链",
+      "as_of": "2026-04-22",
+      "latest": 476.83,
+      "return_1m_pct": 21.84,
+      "return_3m_pct": 18.64,
+      "return_6m_pct": 37.76,
+      "return_1y_pct": 154.65,
+      "return_3y_pct": 283.75,
+      "return_5y_pct": 287.88,
+      "max_drawdown_1y_pct": -14.93,
+      "max_drawdown_5y_pct": -45.3,
+      "ma20": 422.15,
+      "ma60": 408.52,
+      "ma120": 386.02,
+      "mom20_pct": 20.84,
+      "mom60_pct": 19.56,
+      "mom120_pct": 31.73,
+      "vol20_annual_pct": 38.46,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "NVDA",
+      "name": "英伟达",
+      "group": "AI/算力",
+      "role": "AI算力龙头",
+      "as_of": "2026-04-22",
+      "latest": 202.5,
+      "return_1m_pct": 15.29,
+      "return_3m_pct": 10.47,
+      "return_6m_pct": 10.89,
+      "return_1y_pct": 109.01,
+      "return_3y_pct": 650.61,
+      "return_5y_pct": 1158.02,
+      "max_drawdown_1y_pct": -20.21,
+      "max_drawdown_5y_pct": -66.34,
+      "ma20": 185.48,
+      "ma60": 184.55,
+      "ma120": 185.32,
+      "mom20_pct": 15.58,
+      "mom60_pct": 8.6,
+      "mom120_pct": 0.74,
+      "vol20_annual_pct": 33.38,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "AMZN",
+      "name": "亚马逊",
+      "group": "科技巨头",
+      "role": "云与电商",
+      "as_of": "2026-04-22",
+      "latest": 255.36,
+      "return_1m_pct": 21.52,
+      "return_3m_pct": 10.4,
+      "return_6m_pct": 17.96,
+      "return_1y_pct": 52.62,
+      "return_3y_pct": 148.55,
+      "return_5y_pct": 51.14,
+      "max_drawdown_1y_pct": -21.74,
+      "max_drawdown_5y_pct": -56.15,
+      "ma20": 227.96,
+      "ma60": 219.15,
+      "ma120": 226.6,
+      "mom20_pct": 23.22,
+      "mom60_pct": 7.11,
+      "mom120_pct": 11.39,
+      "vol20_annual_pct": 34.13,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "QQQ",
+      "name": "纳斯达克100 ETF",
+      "group": "宽基核心",
+      "role": "科技成长基准",
+      "as_of": "2026-04-22",
+      "latest": 655.11,
+      "return_1m_pct": 11.41,
+      "return_3m_pct": 6.43,
+      "return_6m_pct": 7.4,
+      "return_1y_pct": 51.99,
+      "return_3y_pct": 109.11,
+      "return_5y_pct": 97.61,
+      "max_drawdown_1y_pct": -11.96,
+      "max_drawdown_5y_pct": -35.12,
+      "ma20": 607.62,
+      "ma60": 606.44,
+      "ma120": 611.32,
+      "mom20_pct": 12.18,
+      "mom60_pct": 4.87,
+      "mom120_pct": 3.77,
+      "vol20_annual_pct": 22.35,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "IWM",
+      "name": "罗素2000 ETF",
+      "group": "宽基核心",
+      "role": "小盘风险偏好",
+      "as_of": "2026-04-22",
+      "latest": 276.48,
+      "return_1m_pct": 11.73,
+      "return_3m_pct": 3.43,
+      "return_6m_pct": 11.98,
+      "return_1y_pct": 52.93,
+      "return_3y_pct": 60.28,
+      "return_5y_pct": 31.07,
+      "max_drawdown_1y_pct": -11.03,
+      "max_drawdown_5y_pct": -31.91,
+      "ma20": 259.85,
+      "ma60": 258.48,
+      "ma120": 253.75,
+      "mom20_pct": 11.13,
+      "mom60_pct": 4.92,
+      "mom120_pct": 11.62,
+      "vol20_annual_pct": 22.21,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "谷歌A",
+      "group": "科技巨头",
+      "role": "搜索/云/AI",
+      "as_of": "2026-04-22",
+      "latest": 339.32,
+      "return_1m_pct": 12.34,
+      "return_3m_pct": 3.4,
+      "return_6m_pct": 32.44,
+      "return_1y_pct": 130.58,
+      "return_3y_pct": 222.85,
+      "return_5y_pct": 199.42,
+      "max_drawdown_1y_pct": -20.37,
+      "max_drawdown_5y_pct": -44.32,
+      "ma20": 311.85,
+      "ma60": 312.66,
+      "ma120": 310.42,
+      "mom20_pct": 16.83,
+      "mom60_pct": 1.89,
+      "mom120_pct": 27.04,
+      "vol20_annual_pct": 34.79,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "COST",
+      "name": "Costco",
+      "group": "防守消费",
+      "role": "消费防守",
+      "as_of": "2026-04-22",
+      "latest": 1003.7,
+      "return_1m_pct": 3.93,
+      "return_3m_pct": 2.26,
+      "return_6m_pct": 7.52,
+      "return_1y_pct": 5.37,
+      "return_3y_pct": 111.64,
+      "return_5y_pct": 187.46,
+      "max_drawdown_1y_pct": -19.35,
+      "max_drawdown_5y_pct": -31.4,
+      "ma20": 998.51,
+      "ma60": 991.62,
+      "ma120": 948.25,
+      "mom20_pct": 3.07,
+      "mom60_pct": 2.8,
+      "mom120_pct": 8.91,
+      "vol20_annual_pct": 18.51,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "DIA",
+      "name": "道琼斯 ETF",
+      "group": "宽基核心",
+      "role": "蓝筹防守",
+      "as_of": "2026-04-22",
+      "latest": 494.76,
+      "return_1m_pct": 7.14,
+      "return_3m_pct": 1.19,
+      "return_6m_pct": 6.75,
+      "return_1y_pct": 31.66,
+      "return_3y_pct": 53.2,
+      "return_5y_pct": 58.73,
+      "max_drawdown_1y_pct": -9.76,
+      "max_drawdown_5y_pct": -20.76,
+      "ma20": 475.15,
+      "ma60": 480.65,
+      "ma120": 479.16,
+      "mom20_pct": 7.33,
+      "mom60_pct": 0.53,
+      "mom120_pct": 4.48,
+      "vol20_annual_pct": 17.15,
+      "score": 100.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "SPY",
+      "name": "标普500 ETF",
+      "group": "宽基核心",
+      "role": "美国大盘基准",
+      "as_of": "2026-04-22",
+      "latest": 711.21,
+      "return_1m_pct": 8.52,
+      "return_3m_pct": 4.05,
+      "return_6m_pct": 6.55,
+      "return_1y_pct": 39.99,
+      "return_3y_pct": 78.54,
+      "return_5y_pct": 83.11,
+      "max_drawdown_1y_pct": -8.88,
+      "max_drawdown_5y_pct": -24.5,
+      "ma20": 674.96,
+      "ma60": 677.55,
+      "ma120": 678.06,
+      "mom20_pct": 8.88,
+      "mom60_pct": 2.95,
+      "mom120_pct": 4.1,
+      "vol20_annual_pct": 18.18,
+      "score": 89.0,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "AAPL",
+      "name": "苹果",
+      "group": "科技巨头",
+      "role": "消费电子现金流",
+      "as_of": "2026-04-22",
+      "latest": 273.17,
+      "return_1m_pct": 8.62,
+      "return_3m_pct": 10.41,
+      "return_6m_pct": 4.37,
+      "return_1y_pct": 42.04,
+      "return_3y_pct": 67.72,
+      "return_5y_pct": 108.52,
+      "max_drawdown_1y_pct": -13.8,
+      "max_drawdown_5y_pct": -33.36,
+      "ma20": 259.45,
+      "ma60": 261.45,
+      "ma120": 265.35,
+      "mom20_pct": 8.56,
+      "mom60_pct": 7.05,
+      "mom120_pct": 1.74,
+      "vol20_annual_pct": 25.93,
+      "score": 86.2,
+      "signal": "强势进攻",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "TLT",
+      "name": "20年美债 ETF",
+      "group": "防守资产",
+      "role": "利率与避险",
+      "as_of": "2026-04-22",
+      "latest": 86.74,
+      "return_1m_pct": 0.81,
+      "return_3m_pct": 0.46,
+      "return_6m_pct": -3.13,
+      "return_1y_pct": 5.44,
+      "return_3y_pct": -5.67,
+      "return_5y_pct": -27.19,
+      "max_drawdown_1y_pct": -6.56,
+      "max_drawdown_5y_pct": -43.7,
+      "ma20": 86.56,
+      "ma60": 87.29,
+      "ma120": 87.26,
+      "mom20_pct": 1.25,
+      "mom60_pct": -0.72,
+      "mom120_pct": -3.62,
+      "vol20_annual_pct": 9.23,
+      "score": 67.3,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "GLD",
+      "name": "黄金 ETF",
+      "group": "防守资产",
+      "role": "风险对冲",
+      "as_of": "2026-04-22",
+      "latest": 435.26,
+      "return_1m_pct": 7.73,
+      "return_3m_pct": -1.88,
+      "return_6m_pct": 7.96,
+      "return_1y_pct": 37.92,
+      "return_3y_pct": 134.6,
+      "return_5y_pct": 163.24,
+      "max_drawdown_1y_pct": -19.21,
+      "max_drawdown_5y_pct": -21.03,
+      "ma20": 431.33,
+      "ma60": 450.72,
+      "ma120": 423.56,
+      "mom20_pct": 7.7,
+      "mom60_pct": -6.34,
+      "mom120_pct": 19.45,
+      "vol20_annual_pct": 31.38,
+      "score": 63.7,
+      "signal": "观察等待",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "MSFT",
+      "name": "微软",
+      "group": "科技巨头",
+      "role": "云与AI平台",
+      "as_of": "2026-04-22",
+      "latest": 432.92,
+      "return_1m_pct": 13.03,
+      "return_3m_pct": -2.3,
+      "return_6m_pct": -15.88,
+      "return_1y_pct": 21.47,
+      "return_3y_pct": 53.45,
+      "return_5y_pct": 73.86,
+      "max_drawdown_1y_pct": -33.91,
+      "max_drawdown_5y_pct": -37.15,
+      "ma20": 386.8,
+      "ma60": 399.13,
+      "ma120": 441.76,
+      "mom20_pct": 16.15,
+      "mom60_pct": -7.73,
+      "mom120_pct": -19.8,
+      "vol20_annual_pct": 28.52,
+      "score": 60.7,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "META",
+      "name": "Meta",
+      "group": "科技巨头",
+      "role": "广告与AI应用",
+      "as_of": "2026-04-22",
+      "latest": 674.72,
+      "return_1m_pct": 11.7,
+      "return_3m_pct": 10.17,
+      "return_6m_pct": -7.69,
+      "return_1y_pct": 39.65,
+      "return_3y_pct": 210.71,
+      "return_5y_pct": 120.91,
+      "max_drawdown_1y_pct": -33.3,
+      "max_drawdown_5y_pct": -76.74,
+      "ma20": 614.88,
+      "ma60": 639.2,
+      "ma120": 639.98,
+      "mom20_pct": 13.8,
+      "mom60_pct": 0.44,
+      "mom120_pct": -10.06,
+      "vol20_annual_pct": 51.82,
+      "score": 60.2,
+      "signal": "观察等待",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "NFLX",
+      "name": "奈飞",
+      "group": "高波动成长",
+      "role": "内容平台",
+      "as_of": "2026-04-22",
+      "latest": 93.24,
+      "return_1m_pct": -0.15,
+      "return_3m_pct": 9.23,
+      "return_6m_pct": -24.72,
+      "return_1y_pct": -5.62,
+      "return_3y_pct": 180.24,
+      "return_5y_pct": 69.77,
+      "max_drawdown_1y_pct": -43.35,
+      "max_drawdown_5y_pct": -75.95,
+      "ma20": 98.37,
+      "ma60": 90.97,
+      "ma120": 95.18,
+      "mom20_pct": 2.55,
+      "mom60_pct": 8.8,
+      "mom120_pct": -15.43,
+      "vol20_annual_pct": 44.98,
+      "score": 52.2,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "PLTR",
+      "name": "Palantir",
+      "group": "AI应用",
+      "role": "AI软件弹性",
+      "as_of": "2026-04-22",
+      "latest": 152.62,
+      "return_1m_pct": -5.11,
+      "return_3m_pct": -7.69,
+      "return_6m_pct": -15.95,
+      "return_1y_pct": 68.08,
+      "return_3y_pct": 1634.32,
+      "return_5y_pct": 559.27,
+      "max_drawdown_1y_pct": -38.19,
+      "max_drawdown_5y_pct": -79.14,
+      "ma20": 143.28,
+      "ma60": 144.73,
+      "ma120": 161.85,
+      "mom20_pct": -1.4,
+      "mom60_pct": -8.87,
+      "mom120_pct": -19.5,
+      "vol20_annual_pct": 58.07,
+      "score": 40.2,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "TSLA",
+      "name": "特斯拉",
+      "group": "高波动成长",
+      "role": "电动车/机器人",
+      "as_of": "2026-04-22",
+      "latest": 387.51,
+      "return_1m_pct": 1.75,
+      "return_3m_pct": -10.18,
+      "return_6m_pct": -13.39,
+      "return_1y_pct": 70.33,
+      "return_3y_pct": 107.18,
+      "return_5y_pct": 57.34,
+      "max_drawdown_1y_pct": -29.93,
+      "max_drawdown_5y_pct": -73.63,
+      "ma20": 369.53,
+      "ma60": 394.04,
+      "ma120": 418.76,
+      "mom20_pct": 1.17,
+      "mom60_pct": -10.96,
+      "mom120_pct": -15.86,
+      "vol20_annual_pct": 48.61,
+      "score": 16.0,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    },
+    {
+      "symbol": "BRK-B",
+      "name": "伯克希尔B",
+      "group": "防守质量",
+      "role": "质量与现金流",
+      "as_of": "2026-04-22",
+      "latest": 465.4,
+      "return_1m_pct": -3.04,
+      "return_3m_pct": -3.81,
+      "return_6m_pct": -5.8,
+      "return_1y_pct": -8.19,
+      "return_3y_pct": 43.74,
+      "return_5y_pct": 72.92,
+      "max_drawdown_1y_pct": -14.95,
+      "max_drawdown_5y_pct": -26.58,
+      "ma20": 475.82,
+      "ma60": 486.81,
+      "ma120": 492.12,
+      "mom20_pct": -2.91,
+      "mom60_pct": -3.74,
+      "mom120_pct": -3.33,
+      "vol20_annual_pct": 11.38,
+      "score": 15.0,
+      "signal": "防守/不追",
+      "source": "local_cache",
+      "history_days": 1262
+    }
+  ],
+  "failures": [],
+  "training": {
+    "generated_at": "2026-04-23 17:00:10",
+    "ok": true,
+    "model_name": "美股趋势动量防守轮动 v1",
+    "coverage": {
+      "symbols": 22,
+      "days": 1262,
+      "start": "2021-04-14",
+      "end": "2026-04-22",
+      "train_window": "2021-04-14 ~ 2024-10-15",
+      "validation_window": "2024-10-16 ~ 2026-04-22"
+    },
+    "discipline": [
+      "训练集和验证集按时间切分，不重叠。",
+      "使用下一交易日执行口径，避免同日收盘信号同日成交的前视偏差。",
+      "回测扣除换手成本，默认 8 bps。",
+      "策略信号只作为投研观察，不保证收益。"
+    ],
+    "factor_set": [
+      "20/60/120 日均线结构",
+      "21/63/126 日动量",
+      "20 日年化波动惩罚",
+      "126 日回撤惩罚",
+      "SPY/QQQ 市场风险开关",
+      "GLD/TLT 防守切换"
+    ],
+    "best_model": {
+      "config": {
+        "label": "top5-W-FRI-攻85-阈65-波0.65-回0.25",
+        "top_n": 5,
+        "rebalance_rule": "W-FRI",
+        "attack_weight_pct": 85.0,
+        "min_score": 65,
+        "vol_penalty": 0.65,
+        "drawdown_penalty": 0.25,
+        "trend_weight": 0.6,
+        "momentum_weight": 0.5,
+        "cost_bps": 8.0
+      },
+      "full": {
+        "total_return_pct": 270.57,
+        "annual_return_pct": 29.81,
+        "max_drawdown_pct": -36.01,
+        "sharpe": 1.109,
+        "calmar": 0.828,
+        "volatility_pct": 26.71,
+        "positive_day_ratio_pct": 51.58
+      },
+      "train": {
+        "total_return_pct": 33.87,
+        "annual_return_pct": 8.68,
+        "max_drawdown_pct": -36.01,
+        "sharpe": 0.5,
+        "calmar": 0.241,
+        "volatility_pct": 21.07,
+        "positive_day_ratio_pct": 48.81
+      },
+      "validation": {
+        "total_return_pct": 179.41,
+        "annual_return_pct": 97.12,
+        "max_drawdown_pct": -24.72,
+        "sharpe": 2.029,
+        "calmar": 3.929,
+        "volatility_pct": 36.52,
+        "positive_day_ratio_pct": 58.05
+      },
+      "recent_3m": {
+        "total_return_pct": -4.3,
+        "annual_return_pct": -16.35,
+        "max_drawdown_pct": -11.26,
+        "sharpe": -0.812,
+        "calmar": -1.452,
+        "volatility_pct": 17.31,
+        "positive_day_ratio_pct": 53.97
+      },
+      "latest_rebalance": "2026-04-22",
+      "current_holdings": [
+        {
+          "symbol": "SOXX",
+          "weight_pct": 85.0
+        },
+        {
+          "symbol": "TLT",
+          "weight_pct": 7.5
+        },
+        {
+          "symbol": "GLD",
+          "weight_pct": 7.5
+        }
+      ]
+    },
+    "benchmarks": {
+      "SPY": {
+        "total_return_pct": 85.07,
+        "annual_return_pct": 13.04,
+        "max_drawdown_pct": -24.5,
+        "sharpe": 0.805,
+        "calmar": 0.532,
+        "volatility_pct": 17.07,
+        "positive_day_ratio_pct": 54.28
+      },
+      "QQQ": {
+        "total_return_pct": 100.61,
+        "annual_return_pct": 14.87,
+        "max_drawdown_pct": -35.12,
+        "sharpe": 0.733,
+        "calmar": 0.423,
+        "volatility_pct": 22.37,
+        "positive_day_ratio_pct": 54.99
+      }
+    },
+    "top_candidates": [
+      {
+        "label": "top5-W-FRI-攻85-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top5-W-FRI-攻85-阈65-波0.65-回0.25",
+          "top_n": 5,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 33.87,
+          "annual_return_pct": 8.68,
+          "max_drawdown_pct": -36.01,
+          "sharpe": 0.5,
+          "calmar": 0.241,
+          "volatility_pct": 21.07,
+          "positive_day_ratio_pct": 48.81
+        },
+        "validation": {
+          "total_return_pct": 179.41,
+          "annual_return_pct": 97.12,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 2.029,
+          "calmar": 3.929,
+          "volatility_pct": 36.52,
+          "positive_day_ratio_pct": 58.05
+        },
+        "selection_score": 103.664
+      },
+      {
+        "label": "top8-W-FRI-攻85-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top8-W-FRI-攻85-阈65-波0.65-回0.25",
+          "top_n": 8,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 34.4,
+          "annual_return_pct": 8.8,
+          "max_drawdown_pct": -36.01,
+          "sharpe": 0.508,
+          "calmar": 0.244,
+          "volatility_pct": 20.88,
+          "positive_day_ratio_pct": 49.04
+        },
+        "validation": {
+          "total_return_pct": 177.71,
+          "annual_return_pct": 96.33,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 2.019,
+          "calmar": 3.897,
+          "volatility_pct": 36.49,
+          "positive_day_ratio_pct": 57.78
+        },
+        "selection_score": 102.807
+      },
+      {
+        "label": "top3-W-FRI-攻85-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top3-W-FRI-攻85-阈65-波0.65-回0.25",
+          "top_n": 3,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 31.83,
+          "annual_return_pct": 8.2,
+          "max_drawdown_pct": -36.01,
+          "sharpe": 0.471,
+          "calmar": 0.228,
+          "volatility_pct": 21.71,
+          "positive_day_ratio_pct": 48.58
+        },
+        "validation": {
+          "total_return_pct": 174.12,
+          "annual_return_pct": 94.65,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 1.984,
+          "calmar": 3.829,
+          "volatility_pct": 36.75,
+          "positive_day_ratio_pct": 56.46
+        },
+        "selection_score": 100.755
+      },
+      {
+        "label": "top5-W-FRI-攻75-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top5-W-FRI-攻75-阈65-波0.65-回0.25",
+          "top_n": 5,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 75.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 31.26,
+          "annual_return_pct": 8.07,
+          "max_drawdown_pct": -34.62,
+          "sharpe": 0.499,
+          "calmar": 0.233,
+          "volatility_pct": 19.27,
+          "positive_day_ratio_pct": 49.26
+        },
+        "validation": {
+          "total_return_pct": 158.36,
+          "annual_return_pct": 87.18,
+          "max_drawdown_pct": -21.83,
+          "sharpe": 2.077,
+          "calmar": 3.994,
+          "volatility_pct": 32.62,
+          "positive_day_ratio_pct": 58.58
+        },
+        "selection_score": 97.044
+      },
+      {
+        "label": "top8-W-FRI-攻75-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top8-W-FRI-攻75-阈65-波0.65-回0.25",
+          "top_n": 8,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 75.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 31.7,
+          "annual_return_pct": 8.17,
+          "max_drawdown_pct": -34.62,
+          "sharpe": 0.506,
+          "calmar": 0.236,
+          "volatility_pct": 19.11,
+          "positive_day_ratio_pct": 49.26
+        },
+        "validation": {
+          "total_return_pct": 156.97,
+          "annual_return_pct": 86.52,
+          "max_drawdown_pct": -21.83,
+          "sharpe": 2.067,
+          "calmar": 3.964,
+          "volatility_pct": 32.59,
+          "positive_day_ratio_pct": 58.58
+        },
+        "selection_score": 96.302
+      },
+      {
+        "label": "top3-W-FRI-攻75-阈65-波0.65-回0.25",
+        "config": {
+          "label": "top3-W-FRI-攻75-阈65-波0.65-回0.25",
+          "top_n": 3,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 75.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.25,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 29.56,
+          "annual_return_pct": 7.67,
+          "max_drawdown_pct": -34.62,
+          "sharpe": 0.471,
+          "calmar": 0.222,
+          "volatility_pct": 19.82,
+          "positive_day_ratio_pct": 49.04
+        },
+        "validation": {
+          "total_return_pct": 154.07,
+          "annual_return_pct": 85.13,
+          "max_drawdown_pct": -21.83,
+          "sharpe": 2.033,
+          "calmar": 3.9,
+          "volatility_pct": 32.81,
+          "positive_day_ratio_pct": 57.78
+        },
+        "selection_score": 94.535
+      },
+      {
+        "label": "top5-W-FRI-攻85-阈65-波0.65-回0.55",
+        "config": {
+          "label": "top5-W-FRI-攻85-阈65-波0.65-回0.55",
+          "top_n": 5,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 29.2,
+          "annual_return_pct": 7.58,
+          "max_drawdown_pct": -35.99,
+          "sharpe": 0.453,
+          "calmar": 0.211,
+          "volatility_pct": 20.97,
+          "positive_day_ratio_pct": 48.7
+        },
+        "validation": {
+          "total_return_pct": 159.4,
+          "annual_return_pct": 87.68,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 1.9,
+          "calmar": 3.547,
+          "volatility_pct": 36.38,
+          "positive_day_ratio_pct": 57.78
+        },
+        "selection_score": 92.979
+      },
+      {
+        "label": "top8-W-FRI-攻85-阈65-波0.65-回0.55",
+        "config": {
+          "label": "top8-W-FRI-攻85-阈65-波0.65-回0.55",
+          "top_n": 8,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 31.78,
+          "annual_return_pct": 8.19,
+          "max_drawdown_pct": -35.99,
+          "sharpe": 0.482,
+          "calmar": 0.228,
+          "volatility_pct": 20.8,
+          "positive_day_ratio_pct": 49.04
+        },
+        "validation": {
+          "total_return_pct": 158.71,
+          "annual_return_pct": 87.35,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 1.896,
+          "calmar": 3.534,
+          "volatility_pct": 36.35,
+          "positive_day_ratio_pct": 57.52
+        },
+        "selection_score": 92.708
+      },
+      {
+        "label": "top3-W-FRI-攻85-阈65-波0.65-回0.55",
+        "config": {
+          "label": "top3-W-FRI-攻85-阈65-波0.65-回0.55",
+          "top_n": 3,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 27.1,
+          "annual_return_pct": 7.08,
+          "max_drawdown_pct": -35.99,
+          "sharpe": 0.423,
+          "calmar": 0.197,
+          "volatility_pct": 21.67,
+          "positive_day_ratio_pct": 48.36
+        },
+        "validation": {
+          "total_return_pct": 153.52,
+          "annual_return_pct": 84.86,
+          "max_drawdown_pct": -24.72,
+          "sharpe": 1.849,
+          "calmar": 3.433,
+          "volatility_pct": 36.58,
+          "positive_day_ratio_pct": 55.94
+        },
+        "selection_score": 89.668
+      },
+      {
+        "label": "top5-W-FRI-攻75-阈65-波0.65-回0.55",
+        "config": {
+          "label": "top5-W-FRI-攻75-阈65-波0.65-回0.55",
+          "top_n": 5,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 75.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 27.2,
+          "annual_return_pct": 7.11,
+          "max_drawdown_pct": -34.6,
+          "sharpe": 0.453,
+          "calmar": 0.205,
+          "volatility_pct": 19.19,
+          "positive_day_ratio_pct": 49.26
+        },
+        "validation": {
+          "total_return_pct": 141.93,
+          "annual_return_pct": 79.24,
+          "max_drawdown_pct": -21.83,
+          "sharpe": 1.949,
+          "calmar": 3.63,
+          "volatility_pct": 32.5,
+          "positive_day_ratio_pct": 58.31
+        },
+        "selection_score": 87.734
+      },
+      {
+        "label": "top8-W-FRI-攻75-阈65-波0.65-回0.55",
+        "config": {
+          "label": "top8-W-FRI-攻75-阈65-波0.65-回0.55",
+          "top_n": 8,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 75.0,
+          "min_score": 65,
+          "vol_penalty": 0.65,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 29.42,
+          "annual_return_pct": 7.64,
+          "max_drawdown_pct": -34.6,
+          "sharpe": 0.481,
+          "calmar": 0.221,
+          "volatility_pct": 19.04,
+          "positive_day_ratio_pct": 49.38
+        },
+        "validation": {
+          "total_return_pct": 141.36,
+          "annual_return_pct": 78.95,
+          "max_drawdown_pct": -21.83,
+          "sharpe": 1.945,
+          "calmar": 3.617,
+          "volatility_pct": 32.47,
+          "positive_day_ratio_pct": 58.31
+        },
+        "selection_score": 87.486
+      },
+      {
+        "label": "top3-W-FRI-攻85-阈65-波0.35-回0.55",
+        "config": {
+          "label": "top3-W-FRI-攻85-阈65-波0.35-回0.55",
+          "top_n": 3,
+          "rebalance_rule": "W-FRI",
+          "attack_weight_pct": 85.0,
+          "min_score": 65,
+          "vol_penalty": 0.35,
+          "drawdown_penalty": 0.55,
+          "trend_weight": 0.6,
+          "momentum_weight": 0.5,
+          "cost_bps": 8.0
+        },
+        "train": {
+          "total_return_pct": 25.32,
+          "annual_return_pct": 6.65,
+          "max_drawdown_pct": -36.45,
+          "sharpe": 0.388,
+          "calmar": 0.183,
+          "volatility_pct": 23.89,
+          "positive_day_ratio_pct": 48.47
+        },
+        "validation": {
+          "total_return_pct": 125.58,
+          "annual_return_pct": 71.14,
+          "max_drawdown_pct": -16.59,
+          "sharpe": 1.88,
+          "calmar": 4.287,
+          "volatility_pct": 31.4,
+          "positive_day_ratio_pct": 54.88
+        },
+        "selection_score": 85.249
+      }
+    ],
+    "chart_series": [
+      {
+        "date": "2025-04-09",
+        "strategy": 2.3219
+      },
+      {
+        "date": "2025-04-10",
+        "strategy": 2.3183
+      },
+      {
+        "date": "2025-04-11",
+        "strategy": 2.3467
+      },
+      {
+        "date": "2025-04-14",
+        "strategy": 2.3484
+      },
+      {
+        "date": "2025-04-15",
+        "strategy": 2.3587
+      },
+      {
+        "date": "2025-04-16",
+        "strategy": 2.4036
+      },
+      {
+        "date": "2025-04-17",
+        "strategy": 2.3877
+      },
+      {
+        "date": "2025-04-21",
+        "strategy": 2.4038
+      },
+      {
+        "date": "2025-04-22",
+        "strategy": 2.3934
+      },
+      {
+        "date": "2025-04-23",
+        "strategy": 2.3764
+      },
+      {
+        "date": "2025-04-24",
+        "strategy": 2.4062
+      },
+      {
+        "date": "2025-04-25",
+        "strategy": 2.402
+      },
+      {
+        "date": "2025-04-28",
+        "strategy": 2.4267
+      },
+      {
+        "date": "2025-04-29",
+        "strategy": 2.425
+      },
+      {
+        "date": "2025-04-30",
+        "strategy": 2.4061
+      },
+      {
+        "date": "2025-05-01",
+        "strategy": 2.3751
+      },
+      {
+        "date": "2025-05-02",
+        "strategy": 2.3643
+      },
+      {
+        "date": "2025-05-05",
+        "strategy": 2.393
+      },
+      {
+        "date": "2025-05-06",
+        "strategy": 2.4305
+      },
+      {
+        "date": "2025-05-07",
+        "strategy": 2.4174
+      },
+      {
+        "date": "2025-05-08",
+        "strategy": 2.3801
+      },
+      {
+        "date": "2025-05-09",
+        "strategy": 2.3905
+      },
+      {
+        "date": "2025-05-12",
+        "strategy": 2.3457
+      },
+      {
+        "date": "2025-05-13",
+        "strategy": 2.346
+      },
+      {
+        "date": "2025-05-14",
+        "strategy": 2.3135
+      },
+      {
+        "date": "2025-05-15",
+        "strategy": 2.3421
+      },
+      {
+        "date": "2025-05-16",
+        "strategy": 2.3279
+      },
+      {
+        "date": "2025-05-19",
+        "strategy": 2.3298
+      },
+      {
+        "date": "2025-05-20",
+        "strategy": 2.3325
+      },
+      {
+        "date": "2025-05-21",
+        "strategy": 2.3351
+      },
+      {
+        "date": "2025-05-22",
+        "strategy": 2.3234
+      },
+      {
+        "date": "2025-05-23",
+        "strategy": 2.3232
+      },
+      {
+        "date": "2025-05-27",
+        "strategy": 2.3663
+      },
+      {
+        "date": "2025-05-28",
+        "strategy": 2.3601
+      },
+      {
+        "date": "2025-05-29",
+        "strategy": 2.3235
+      },
+      {
+        "date": "2025-05-30",
+        "strategy": 2.3583
+      },
+      {
+        "date": "2025-06-02",
+        "strategy": 2.3986
+      },
+      {
+        "date": "2025-06-03",
+        "strategy": 2.4292
+      },
+      {
+        "date": "2025-06-04",
+        "strategy": 2.4688
+      },
+      {
+        "date": "2025-06-05",
+        "strategy": 2.4725
+      },
+      {
+        "date": "2025-06-06",
+        "strategy": 2.4058
+      },
+      {
+        "date": "2025-06-09",
+        "strategy": 2.3789
+      },
+      {
+        "date": "2025-06-10",
+        "strategy": 2.3454
+      },
+      {
+        "date": "2025-06-11",
+        "strategy": 2.3738
+      },
+      {
+        "date": "2025-06-12",
+        "strategy": 2.3702
+      },
+      {
+        "date": "2025-06-13",
+        "strategy": 2.3644
+      },
+      {
+        "date": "2025-06-16",
+        "strategy": 2.4003
+      },
+      {
+        "date": "2025-06-17",
+        "strategy": 2.3756
+      },
+      {
+        "date": "2025-06-18",
+        "strategy": 2.3891
+      },
+      {
+        "date": "2025-06-20",
+        "strategy": 2.377
+      },
+      {
+        "date": "2025-06-23",
+        "strategy": 2.4155
+      },
+      {
+        "date": "2025-06-24",
+        "strategy": 2.4592
+      },
+      {
+        "date": "2025-06-25",
+        "strategy": 2.4545
+      },
+      {
+        "date": "2025-06-26",
+        "strategy": 2.4907
+      },
+      {
+        "date": "2025-06-27",
+        "strategy": 2.3976
+      },
+      {
+        "date": "2025-06-30",
+        "strategy": 2.4142
+      },
+      {
+        "date": "2025-07-01",
+        "strategy": 2.3661
+      },
+      {
+        "date": "2025-07-02",
+        "strategy": 2.3967
+      },
+      {
+        "date": "2025-07-03",
+        "strategy": 2.4193
+      },
+      {
+        "date": "2025-07-07",
+        "strategy": 2.397
+      },
+      {
+        "date": "2025-07-08",
+        "strategy": 2.3981
+      },
+      {
+        "date": "2025-07-09",
+        "strategy": 2.4328
+      },
+      {
+        "date": "2025-07-10",
+        "strategy": 2.4304
+      },
+      {
+        "date": "2025-07-11",
+        "strategy": 2.4322
+      },
+      {
+        "date": "2025-07-14",
+        "strategy": 2.448
+      },
+      {
+        "date": "2025-07-15",
+        "strategy": 2.4795
+      },
+      {
+        "date": "2025-07-16",
+        "strategy": 2.4864
+      },
+      {
+        "date": "2025-07-17",
+        "strategy": 2.5157
+      },
+      {
+        "date": "2025-07-18",
+        "strategy": 2.505
+      },
+      {
+        "date": "2025-07-21",
+        "strategy": 2.5098
+      },
+      {
+        "date": "2025-07-22",
+        "strategy": 2.4663
+      },
+      {
+        "date": "2025-07-23",
+        "strategy": 2.5082
+      },
+      {
+        "date": "2025-07-24",
+        "strategy": 2.5334
+      },
+      {
+        "date": "2025-07-25",
+        "strategy": 2.5558
+      },
+      {
+        "date": "2025-07-28",
+        "strategy": 2.5788
+      },
+      {
+        "date": "2025-07-29",
+        "strategy": 2.5866
+      },
+      {
+        "date": "2025-07-30",
+        "strategy": 2.614
+      },
+      {
+        "date": "2025-07-31",
+        "strategy": 2.5879
+      },
+      {
+        "date": "2025-08-01",
+        "strategy": 2.5415
+      },
+      {
+        "date": "2025-08-04",
+        "strategy": 2.618
+      },
+      {
+        "date": "2025-08-05",
+        "strategy": 2.6403
+      },
+      {
+        "date": "2025-08-06",
+        "strategy": 2.6434
+      },
+      {
+        "date": "2025-08-07",
+        "strategy": 2.6932
+      },
+      {
+        "date": "2025-08-08",
+        "strategy": 2.7168
+      },
+      {
+        "date": "2025-08-11",
+        "strategy": 2.6952
+      },
+      {
+        "date": "2025-08-12",
+        "strategy": 2.7366
+      },
+      {
+        "date": "2025-08-13",
+        "strategy": 2.7504
+      },
+      {
+        "date": "2025-08-14",
+        "strategy": 2.7314
+      },
+      {
+        "date": "2025-08-15",
+        "strategy": 2.6925
+      },
+      {
+        "date": "2025-08-18",
+        "strategy": 2.6809
+      },
+      {
+        "date": "2025-08-19",
+        "strategy": 2.5565
+      },
+      {
+        "date": "2025-08-20",
+        "strategy": 2.5409
+      },
+      {
+        "date": "2025-08-21",
+        "strategy": 2.5308
+      },
+      {
+        "date": "2025-08-22",
+        "strategy": 2.5703
+      },
+      {
+        "date": "2025-08-25",
+        "strategy": 2.5635
+      },
+      {
+        "date": "2025-08-26",
+        "strategy": 2.5721
+      },
+      {
+        "date": "2025-08-27",
+        "strategy": 2.5732
+      },
+      {
+        "date": "2025-08-28",
+        "strategy": 2.5912
+      },
+      {
+        "date": "2025-08-29",
+        "strategy": 2.591
+      },
+      {
+        "date": "2025-09-02",
+        "strategy": 2.578
+      },
+      {
+        "date": "2025-09-03",
+        "strategy": 2.7818
+      },
+      {
+        "date": "2025-09-04",
+        "strategy": 2.7993
+      },
+      {
+        "date": "2025-09-05",
+        "strategy": 2.8311
+      },
+      {
+        "date": "2025-09-08",
+        "strategy": 2.8711
+      },
+      {
+        "date": "2025-09-09",
+        "strategy": 2.8669
+      },
+      {
+        "date": "2025-09-10",
+        "strategy": 2.9856
+      },
+      {
+        "date": "2025-09-11",
+        "strategy": 2.959
+      },
+      {
+        "date": "2025-09-12",
+        "strategy": 2.9616
+      },
+      {
+        "date": "2025-09-15",
+        "strategy": 3.0357
+      },
+      {
+        "date": "2025-09-16",
+        "strategy": 3.0198
+      },
+      {
+        "date": "2025-09-17",
+        "strategy": 2.9598
+      },
+      {
+        "date": "2025-09-18",
+        "strategy": 2.9663
+      },
+      {
+        "date": "2025-09-19",
+        "strategy": 2.9772
+      },
+      {
+        "date": "2025-09-22",
+        "strategy": 2.9948
+      },
+      {
+        "date": "2025-09-23",
+        "strategy": 3.0178
+      },
+      {
+        "date": "2025-09-24",
+        "strategy": 3.0138
+      },
+      {
+        "date": "2025-09-25",
+        "strategy": 2.9724
+      },
+      {
+        "date": "2025-09-26",
+        "strategy": 2.9878
+      },
+      {
+        "date": "2025-09-29",
+        "strategy": 2.9953
+      },
+      {
+        "date": "2025-09-30",
+        "strategy": 3.023
+      },
+      {
+        "date": "2025-10-01",
+        "strategy": 3.08
+      },
+      {
+        "date": "2025-10-02",
+        "strategy": 3.0552
+      },
+      {
+        "date": "2025-10-03",
+        "strategy": 3.0055
+      },
+      {
+        "date": "2025-10-06",
+        "strategy": 3.0898
+      },
+      {
+        "date": "2025-10-07",
+        "strategy": 3.0232
+      },
+      {
+        "date": "2025-10-08",
+        "strategy": 3.081
+      },
+      {
+        "date": "2025-10-09",
+        "strategy": 3.0545
+      },
+      {
+        "date": "2025-10-10",
+        "strategy": 2.9236
+      },
+      {
+        "date": "2025-10-13",
+        "strategy": 2.9583
+      },
+      {
+        "date": "2025-10-14",
+        "strategy": 2.9736
+      },
+      {
+        "date": "2025-10-15",
+        "strategy": 2.9961
+      },
+      {
+        "date": "2025-10-16",
+        "strategy": 3.0424
+      },
+      {
+        "date": "2025-10-17",
+        "strategy": 3.0073
+      },
+      {
+        "date": "2025-10-20",
+        "strategy": 3.0492
+      },
+      {
+        "date": "2025-10-21",
+        "strategy": 2.9741
+      },
+      {
+        "date": "2025-10-22",
+        "strategy": 2.9867
+      },
+      {
+        "date": "2025-10-23",
+        "strategy": 3.0001
+      },
+      {
+        "date": "2025-10-24",
+        "strategy": 3.0683
+      },
+      {
+        "date": "2025-10-27",
+        "strategy": 3.1565
+      },
+      {
+        "date": "2025-10-28",
+        "strategy": 3.1375
+      },
+      {
+        "date": "2025-10-29",
+        "strategy": 3.205
+      },
+      {
+        "date": "2025-10-30",
+        "strategy": 3.2769
+      },
+      {
+        "date": "2025-10-31",
+        "strategy": 3.272
+      },
+      {
+        "date": "2025-11-03",
+        "strategy": 3.2968
+      },
+      {
+        "date": "2025-11-04",
+        "strategy": 3.232
+      },
+      {
+        "date": "2025-11-05",
+        "strategy": 3.2992
+      },
+      {
+        "date": "2025-11-06",
+        "strategy": 3.3055
+      },
+      {
+        "date": "2025-11-07",
+        "strategy": 3.248
+      },
+      {
+        "date": "2025-11-10",
+        "strategy": 3.3662
+      },
+      {
+        "date": "2025-11-11",
+        "strategy": 3.3803
+      },
+      {
+        "date": "2025-11-12",
+        "strategy": 3.3395
+      },
+      {
+        "date": "2025-11-13",
+        "strategy": 3.2548
+      },
+      {
+        "date": "2025-11-14",
+        "strategy": 3.2276
+      },
+      {
+        "date": "2025-11-17",
+        "strategy": 3.3108
+      },
+      {
+        "date": "2025-11-18",
+        "strategy": 3.3052
+      },
+      {
+        "date": "2025-11-19",
+        "strategy": 3.3895
+      },
+      {
+        "date": "2025-11-20",
+        "strategy": 3.3573
+      },
+      {
+        "date": "2025-11-21",
+        "strategy": 3.4584
+      },
+      {
+        "date": "2025-11-24",
+        "strategy": 3.6495
+      },
+      {
+        "date": "2025-11-25",
+        "strategy": 3.6975
+      },
+      {
+        "date": "2025-11-26",
+        "strategy": 3.667
+      },
+      {
+        "date": "2025-11-28",
+        "strategy": 3.6689
+      },
+      {
+        "date": "2025-12-01",
+        "strategy": 3.6648
+      },
+      {
+        "date": "2025-12-02",
+        "strategy": 3.6847
+      },
+      {
+        "date": "2025-12-03",
+        "strategy": 3.693
+      },
+      {
+        "date": "2025-12-04",
+        "strategy": 3.6627
+      },
+      {
+        "date": "2025-12-05",
+        "strategy": 3.6657
+      },
+      {
+        "date": "2025-12-08",
+        "strategy": 3.5929
+      },
+      {
+        "date": "2025-12-09",
+        "strategy": 3.6272
+      },
+      {
+        "date": "2025-12-10",
+        "strategy": 3.6599
+      },
+      {
+        "date": "2025-12-11",
+        "strategy": 3.5869
+      },
+      {
+        "date": "2025-12-12",
+        "strategy": 3.5503
+      },
+      {
+        "date": "2025-12-15",
+        "strategy": 3.5531
+      },
+      {
+        "date": "2025-12-16",
+        "strategy": 3.5633
+      },
+      {
+        "date": "2025-12-17",
+        "strategy": 3.5769
+      },
+      {
+        "date": "2025-12-18",
+        "strategy": 3.5823
+      },
+      {
+        "date": "2025-12-19",
+        "strategy": 3.5776
+      },
+      {
+        "date": "2025-12-22",
+        "strategy": 3.615
+      },
+      {
+        "date": "2025-12-23",
+        "strategy": 3.6419
+      },
+      {
+        "date": "2025-12-24",
+        "strategy": 3.6454
+      },
+      {
+        "date": "2025-12-26",
+        "strategy": 3.6557
+      },
+      {
+        "date": "2025-12-29",
+        "strategy": 3.6453
+      },
+      {
+        "date": "2025-12-30",
+        "strategy": 3.6477
+      },
+      {
+        "date": "2025-12-31",
+        "strategy": 3.6354
+      },
+      {
+        "date": "2026-01-02",
+        "strategy": 3.6575
+      },
+      {
+        "date": "2026-01-05",
+        "strategy": 3.6798
+      },
+      {
+        "date": "2026-01-06",
+        "strategy": 3.6605
+      },
+      {
+        "date": "2026-01-07",
+        "strategy": 3.7351
+      },
+      {
+        "date": "2026-01-08",
+        "strategy": 3.7694
+      },
+      {
+        "date": "2026-01-09",
+        "strategy": 3.8041
+      },
+      {
+        "date": "2026-01-12",
+        "strategy": 3.841
+      },
+      {
+        "date": "2026-01-13",
+        "strategy": 3.8815
+      },
+      {
+        "date": "2026-01-14",
+        "strategy": 3.8849
+      },
+      {
+        "date": "2026-01-15",
+        "strategy": 3.8529
+      },
+      {
+        "date": "2026-01-16",
+        "strategy": 3.8199
+      },
+      {
+        "date": "2026-01-20",
+        "strategy": 3.7634
+      },
+      {
+        "date": "2026-01-21",
+        "strategy": 3.8525
+      },
+      {
+        "date": "2026-01-22",
+        "strategy": 3.8723
+      },
+      {
+        "date": "2026-01-23",
+        "strategy": 3.8428
+      },
+      {
+        "date": "2026-01-26",
+        "strategy": 3.9015
+      },
+      {
+        "date": "2026-01-27",
+        "strategy": 3.9197
+      },
+      {
+        "date": "2026-01-28",
+        "strategy": 3.9449
+      },
+      {
+        "date": "2026-01-29",
+        "strategy": 3.9682
+      },
+      {
+        "date": "2026-01-30",
+        "strategy": 3.9334
+      },
+      {
+        "date": "2026-02-02",
+        "strategy": 3.977
+      },
+      {
+        "date": "2026-02-03",
+        "strategy": 3.9576
+      },
+      {
+        "date": "2026-02-04",
+        "strategy": 3.8906
+      },
+      {
+        "date": "2026-02-05",
+        "strategy": 3.8682
+      },
+      {
+        "date": "2026-02-06",
+        "strategy": 3.7888
+      },
+      {
+        "date": "2026-02-09",
+        "strategy": 3.8365
+      },
+      {
+        "date": "2026-02-10",
+        "strategy": 3.8396
+      },
+      {
+        "date": "2026-02-11",
+        "strategy": 3.8511
+      },
+      {
+        "date": "2026-02-12",
+        "strategy": 3.8098
+      },
+      {
+        "date": "2026-02-13",
+        "strategy": 3.8677
+      },
+      {
+        "date": "2026-02-17",
+        "strategy": 3.8106
+      },
+      {
+        "date": "2026-02-18",
+        "strategy": 3.8463
+      },
+      {
+        "date": "2026-02-19",
+        "strategy": 3.8536
+      },
+      {
+        "date": "2026-02-20",
+        "strategy": 3.887
+      },
+      {
+        "date": "2026-02-23",
+        "strategy": 3.9467
+      },
+      {
+        "date": "2026-02-24",
+        "strategy": 3.9229
+      },
+      {
+        "date": "2026-02-25",
+        "strategy": 3.9182
+      },
+      {
+        "date": "2026-02-26",
+        "strategy": 3.9428
+      },
+      {
+        "date": "2026-02-27",
+        "strategy": 3.9807
+      },
+      {
+        "date": "2026-03-02",
+        "strategy": 3.9865
+      },
+      {
+        "date": "2026-03-03",
+        "strategy": 3.8935
+      },
+      {
+        "date": "2026-03-04",
+        "strategy": 3.9027
+      },
+      {
+        "date": "2026-03-05",
+        "strategy": 3.8713
+      },
+      {
+        "date": "2026-03-06",
+        "strategy": 3.8948
+      },
+      {
+        "date": "2026-03-09",
+        "strategy": 3.9077
+      },
+      {
+        "date": "2026-03-10",
+        "strategy": 3.9089
+      },
+      {
+        "date": "2026-03-11",
+        "strategy": 3.8771
+      },
+      {
+        "date": "2026-03-12",
+        "strategy": 3.8352
+      },
+      {
+        "date": "2026-03-13",
+        "strategy": 3.8009
+      },
+      {
+        "date": "2026-03-16",
+        "strategy": 3.8139
+      },
+      {
+        "date": "2026-03-17",
+        "strategy": 3.8144
+      },
+      {
+        "date": "2026-03-18",
+        "strategy": 3.7434
+      },
+      {
+        "date": "2026-03-19",
+        "strategy": 3.6776
+      },
+      {
+        "date": "2026-03-20",
+        "strategy": 3.5865
+      },
+      {
+        "date": "2026-03-23",
+        "strategy": 3.5577
+      },
+      {
+        "date": "2026-03-24",
+        "strategy": 3.5503
+      },
+      {
+        "date": "2026-03-25",
+        "strategy": 3.6208
+      },
+      {
+        "date": "2026-03-26",
+        "strategy": 3.5376
+      },
+      {
+        "date": "2026-03-27",
+        "strategy": 3.59
+      },
+      {
+        "date": "2026-03-30",
+        "strategy": 3.6134
+      },
+      {
+        "date": "2026-03-31",
+        "strategy": 3.6799
+      },
+      {
+        "date": "2026-04-01",
+        "strategy": 3.7103
+      },
+      {
+        "date": "2026-04-02",
+        "strategy": 3.6861
+      },
+      {
+        "date": "2026-04-06",
+        "strategy": 3.6756
+      },
+      {
+        "date": "2026-04-07",
+        "strategy": 3.6932
+      },
+      {
+        "date": "2026-04-08",
+        "strategy": 3.7108
+      },
+      {
+        "date": "2026-04-09",
+        "strategy": 3.7206
+      },
+      {
+        "date": "2026-04-10",
+        "strategy": 3.7127
+      },
+      {
+        "date": "2026-04-13",
+        "strategy": 3.7108
+      },
+      {
+        "date": "2026-04-14",
+        "strategy": 3.7621
+      },
+      {
+        "date": "2026-04-15",
+        "strategy": 3.7343
+      },
+      {
+        "date": "2026-04-16",
+        "strategy": 3.7209
+      },
+      {
+        "date": "2026-04-17",
+        "strategy": 3.7627
+      },
+      {
+        "date": "2026-04-20",
+        "strategy": 3.746
+      },
+      {
+        "date": "2026-04-21",
+        "strategy": 3.6827
+      },
+      {
+        "date": "2026-04-22",
+        "strategy": 3.7057
+      }
+    ]
+  },
+  "compliance_note": {
+    "summary": "本看板只做投研观察，不提供开户、换汇、下单或收益保证。",
+    "preferred_paths": [
+      "境内合规 QDII/互联互通产品",
+      "具备合法资质的金融机构"
+    ]
+  }
+}

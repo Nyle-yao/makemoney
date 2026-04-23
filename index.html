@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>量化看板静态展示站</title>
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #667085;
+        --line: rgba(23,32,51,.10);
+        --brand: #d33b2f;
+        --paper: rgba(255,255,255,.82);
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "PingFang SC", sans-serif;
+        background:
+          radial-gradient(circle at 15% 20%, rgba(211,59,47,.18), transparent 26%),
+          radial-gradient(circle at 88% 14%, rgba(31,138,91,.12), transparent 24%),
+          linear-gradient(180deg, #f7f2ea 0%, #eee6da 100%);
+        color: var(--ink);
+      }
+      .wrap {
+        width: min(1080px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 72px 0;
+      }
+      .hero {
+        border: 1px solid var(--line);
+        border-radius: 34px;
+        padding: 34px;
+        background: var(--paper);
+        box-shadow: 0 28px 90px rgba(66,43,23,.12);
+      }
+      .eyebrow {
+        letter-spacing: .28em;
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 900;
+      }
+      h1 {
+        margin: 12px 0 8px;
+        font-size: clamp(38px, 8vw, 84px);
+        line-height: .95;
+        letter-spacing: -.08em;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.8;
+        max-width: 780px;
+      }
+      .primary {
+        display: inline-flex;
+        margin-top: 18px;
+        border-radius: 999px;
+        padding: 13px 20px;
+        background: var(--brand);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 900;
+        box-shadow: 0 16px 34px rgba(211,59,47,.22);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .board-card {
+        display: block;
+        text-decoration: none;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 18px;
+        background: rgba(255,255,255,.68);
+      }
+      .board-card span {
+        display: block;
+        font-size: 20px;
+        font-weight: 900;
+      }
+      .board-card small {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      @media (max-width: 860px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <div class="eyebrow">STATIC QUANT BOARDS</div>
+        <h1>量化看板静态展示站</h1>
+        <p>这是只读静态展示站：外部只能查看你允许公开的看板快照，不能访问本地数据仓库、iFinD token、算法源码或本地接口。</p>
+        <a class="primary" href="./sector-board/">进入默认看板：易总行业量化</a>
+      </section>
+      <section class="grid">
+        
+        <a class="board-card" href="./fund-board/">
+          <span>基金主台</span>
+          <small>基金组合决策台</small>
+        </a>
+        
+
+        <a class="board-card" href="./fund-dual-momentum-board/">
+          <span>双动量独立台</span>
+          <small>基金双动量轮动</small>
+        </a>
+        
+
+        <a class="board-card" href="./fund-yield-board/">
+          <span>基金高收益台</span>
+          <small>基金高收益进攻观察</small>
+        </a>
+        
+
+        <a class="board-card" href="./fund-universe/">
+          <span>全市场基金池</span>
+          <small>全市场基金池快照</small>
+        </a>
+        
+
+        <a class="board-card" href="./stock-board/">
+          <span>股票主台</span>
+          <small>股票多策略决策台</small>
+        </a>
+        
+
+        <a class="board-card" href="./stock-yield-board/">
+          <span>股票高收益台</span>
+          <small>股票高收益突破观察</small>
+        </a>
+        
+
+        <a class="board-card" href="./us-stock-board/">
+          <span>美股观察台</span>
+          <small>美股量化观察</small>
+        </a>
+        
+
+        <a class="board-card" href="./sector-board/">
+          <span>易总行业量化</span>
+          <small>板块风向标与未来22个交易日观察信号</small>
+        </a>
+        
+
+        <a class="board-card" href="./delivery-log/">
+          <span>交付说明台</span>
+          <small>项目交付说明</small>
+        </a>
+        
+      </section>
+    </main>
+  </body>
+</html>

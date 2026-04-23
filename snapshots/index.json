@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-04-23 17:00:16",
+  "dates": [
+    {
+      "date": "2026-04-23",
+      "files": [
+        "fund_board_snapshot.json",
+        "fund_dual_momentum_snapshot.json",
+        "fund_universe_snapshot.json",
+        "fund_yield_hunter_snapshot.json",
+        "sector_rotation_dashboard_snapshot.json",
+        "stock_dashboard_snapshot.json",
+        "stock_yield_hunter_snapshot.json",
+        "us_stock_dashboard_snapshot.json"
+      ]
+    }
+  ]
+}

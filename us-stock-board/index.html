@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>美股观察台</title>
+    <style>
+      :root {
+        --bg: #eef4f2;
+        --paper: rgba(255, 255, 250, 0.86);
+        --paper-strong: rgba(255, 255, 255, 0.96);
+        --ink: #142233;
+        --muted: #657585;
+        --line: rgba(20, 34, 51, 0.1);
+        --accent: #0b6b74;
+        --accent-2: #d36b3d;
+        --accent-3: #b8891f;
+        --good: #127b55;
+        --bad: #b84b36;
+        --shadow: 0 28px 80px rgba(34, 55, 63, 0.16);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+        background:
+          radial-gradient(circle at 8% 0%, rgba(11, 107, 116, 0.18), transparent 28%),
+          radial-gradient(circle at 92% 10%, rgba(211, 107, 61, 0.15), transparent 24%),
+          linear-gradient(180deg, #f4f0e8 0%, #e8f0ef 100%);
+      }
+
+      .shell {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: clamp(14px, 2.4vw, 26px);
+      }
+
+      .board-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .board-nav-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      .board-nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .board-nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(20, 34, 51, 0.08);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .board-nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #17929c);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: clamp(24px, 4vw, 38px);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 251, 0.98), rgba(237, 248, 247, 0.9)),
+          radial-gradient(circle at 100% 100%, rgba(11, 107, 116, 0.18), transparent 34%);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      h1 {
+        margin: 14px 0 12px;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+        font-size: clamp(44px, 6vw, 82px);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+      }
+
+      .subtitle {
+        max-width: 68ch;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .hero-action {
+        display: inline-flex;
+        margin-top: 18px;
+        padding: 13px 18px;
+        border-radius: 999px;
+        background: rgba(11, 107, 116, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .hero-side {
+        border-radius: 28px;
+        padding: 22px;
+        background: #142233;
+        color: #fff;
+        min-height: 260px;
+      }
+
+      .hero-side h2 { margin: 0 0 12px; font-size: 18px; }
+
+      .symbol-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .symbol-chip {
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        font-weight: 700;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin: 18px 0;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 11px 16px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .status { color: var(--muted); font-size: 14px; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin: 18px 0;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 24px;
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.68);
+        box-shadow: 0 18px 50px rgba(31, 52, 61, 0.08);
+      }
+
+      .card .label { color: var(--muted); font-size: 13px; }
+      .card .value { margin-top: 8px; font-size: 28px; font-weight: 800; }
+      .card .detail { margin-top: 8px; color: var(--muted); line-height: 1.55; font-size: 13px; }
+
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: flex-end;
+        margin: 26px 0 12px;
+      }
+
+      .section-title h2 { margin: 0; font-size: 24px; }
+      .section-title p { margin: 0; color: var(--muted); }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 24px;
+        background: var(--paper-strong);
+        box-shadow: 0 18px 50px rgba(31, 52, 61, 0.08);
+      }
+
+      th, td {
+        padding: 13px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        font-size: 13px;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 700;
+        background: rgba(20, 34, 51, 0.04);
+      }
+
+      .ticker { font-weight: 900; font-size: 15px; }
+      .muted { color: var(--muted); }
+      .good { color: var(--good); font-weight: 800; }
+      .bad { color: var(--bad); font-weight: 800; }
+      .signal {
+        display: inline-flex;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(11, 107, 116, 0.1);
+        color: var(--accent);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 24px;
+        background: rgba(211, 107, 61, 0.1);
+        color: #7e3b24;
+        line-height: 1.7;
+      }
+
+      .guide {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+        gap: 16px;
+      }
+
+      .guide-panel {
+        padding: 20px;
+        border-radius: 28px;
+        background: var(--paper-strong);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 18px 50px rgba(31, 52, 61, 0.08);
+      }
+
+      .guide-panel h2,
+      .guide-panel h3 {
+        margin: 0 0 12px;
+      }
+
+      .guide-steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        border-radius: 20px;
+        padding: 14px;
+        background: rgba(11, 107, 116, 0.08);
+        min-height: 136px;
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+
+      .step span {
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 13px;
+      }
+
+      .legend-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .legend-item {
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(20, 34, 51, 0.04);
+        line-height: 1.55;
+      }
+
+      .legend-item b { color: var(--ink); }
+
+      @media (max-width: 900px) {
+        .hero-grid, .grid, .guide, .guide-steps { grid-template-columns: 1fr; }
+        table { display: block; overflow-x: auto; white-space: nowrap; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="board-nav">
+        <div class="board-nav-label">站内导航</div>
+        <div class="board-nav-links">
+          <a class="board-nav-link" href="/fund-board">基金主台</a>
+          <a class="board-nav-link" href="/fund-dual-momentum-board">双动量独立台</a>
+          <a class="board-nav-link" href="/fund-yield-board">基金高收益台</a>
+          <a class="board-nav-link" href="/fund-universe">全市场基金池</a>
+          <a class="board-nav-link" href="/stock-board">股票主台</a>
+          <a class="board-nav-link" href="/stock-yield-board">股票高收益台</a>
+          <a class="board-nav-link" href="/sector-board">易总行业量化</a>
+          <a class="board-nav-link active" href="/us-stock-board">美股观察台</a>
+          <a class="board-nav-link" href="/delivery-log">交付说明台</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">US MARKET OBSERVATION DESK</div>
+            <h1>美股观察台</h1>
+            <p class="subtitle" id="heroSummary">正在读取美股日线、趋势、回撤和信号。</p>
+            <div class="hero-action" id="heroAction">加载中</div>
+          </div>
+          <aside class="hero-side">
+            <h2>当前优先观察</h2>
+            <p id="heroHeadline">等待数据生成。</p>
+            <div class="symbol-row" id="topSymbols"></div>
+          </aside>
+        </div>
+      </section>
+
+      <div class="toolbar">
+        <button id="refreshBtn">刷新美股数据</button>
+        <span class="status" id="status">准备就绪</span>
+      </div>
+
+      <section class="guide">
+        <div class="guide-panel">
+          <h2>不熟美股时，先按这 4 步看</h2>
+          <div class="guide-steps">
+            <div class="step"><strong>1. 看总动作</strong><span>先看顶部“进攻观察 / 谨慎观察 / 防守等待”，这是市场风险偏好的第一句话。</span></div>
+            <div class="step"><strong>2. 看优先观察</strong><span>右上角代码是模型当前最强方向，不代表立刻买，而是告诉你该重点研究谁。</span></div>
+            <div class="step"><strong>3. 看训练结果</strong><span>样本外年化和最大回撤一起看，收益高但回撤也高时不能盲目上仓位。</span></div>
+            <div class="step"><strong>4. 看失效温度</strong><span>近 3 个月状态如果转差，说明强势策略短期降温，要降低追高冲动。</span></div>
+          </div>
+        </div>
+        <div class="guide-panel">
+          <h3>代码速记</h3>
+          <div class="legend-list">
+            <div class="legend-item"><b>SPY / QQQ</b>：美股大盘和科技成长的温度计。</div>
+            <div class="legend-item"><b>SMH / SOXX</b>：半导体行业篮子，适合看 AI 算力主线强不强。</div>
+            <div class="legend-item"><b>NVDA / AVGO / AMD</b>：AI 芯片和算力弹性核心观察标的。</div>
+            <div class="legend-item"><b>GLD / TLT</b>：黄金和长债，常用作风险防守参考。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid" id="statsGrid"></section>
+
+      <section>
+        <div class="section-title">
+          <div>
+            <h2>量化训练结果</h2>
+            <p>训练集和验证集按时间切分，不重叠；结果用于投研观察，不作收益承诺。</p>
+          </div>
+        </div>
+        <div class="grid" id="trainingGrid"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>当前模型持仓</th>
+              <th>权重</th>
+              <th>解释</th>
+            </tr>
+          </thead>
+          <tbody id="trainingHoldings"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <div class="section-title">
+          <div>
+            <h2>模型说明</h2>
+            <p>先做投研观察，不做收益承诺；后续可升级分钟级盘中执行。</p>
+          </div>
+        </div>
+        <div class="grid" id="strategyGrid"></div>
+      </section>
+
+      <section>
+        <div class="section-title">
+          <div>
+            <h2>标的评分表</h2>
+            <p>按趋势、动量、回撤、波动综合排序。</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>标的</th>
+              <th>分组</th>
+              <th>信号</th>
+              <th>评分</th>
+              <th>近3月</th>
+              <th>近1年</th>
+              <th>1年回撤</th>
+              <th>20日波动</th>
+              <th>均线结构</th>
+              <th>新手解释</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </section>
+
+      <div class="note">
+        合规提示：这个页面是投研观察台，不是开户、换汇、下单工具。国内个人参与境外证券投资应优先走合规产品和有资质机构，不能把个人购汇额度当作绕道买卖境外股票的通道。
+      </div>
+    </main>
+
+    <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+    <script>
+      const fmt = (value, suffix = "") => {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        return `${Number(value).toFixed(2)}${suffix}`;
+      };
+
+      const cls = (value) => Number(value || 0) >= 0 ? "good" : "bad";
+
+      const symbolHelp = {
+        SPY: "看美国大盘是不是健康，是所有美股判断的底座。",
+        QQQ: "看纳斯达克科技成长强不强，科技股行情的温度计。",
+        DIA: "偏传统蓝筹，适合观察美股防守型资金。",
+        IWM: "看小盘股风险偏好，强说明市场更敢冒险。",
+        SMH: "半导体 ETF，AI 算力主线很常看它。",
+        SOXX: "半导体 ETF，和 SMH 类似，可互相验证芯片强度。",
+        NVDA: "AI 算力核心龙头，高弹性但波动也大。",
+        AVGO: "AI 网络和定制芯片龙头，偏质量成长。",
+        AMD: "AI 芯片弹性标的，涨跌会比大盘更剧烈。",
+        TSM: "全球先进制程核心，半导体产业链关键观察。",
+        AAPL: "消费电子巨头，偏现金流和生态。",
+        MSFT: "云和 AI 平台龙头，偏稳健科技。",
+        GOOGL: "搜索、广告、云和 AI，科技巨头之一。",
+        AMZN: "云计算和电商，兼具成长与周期。",
+        META: "广告平台和 AI 应用，利润弹性强。",
+        TSLA: "高波动成长股，看电动车、机器人和风险偏好。",
+        NFLX: "流媒体平台，偏消费成长。",
+        PLTR: "AI 软件弹性标的，波动较大。",
+        COST: "防守消费，市场差时常被用来观察稳健资金。",
+        "BRK-B": "伯克希尔，偏质量、防守和长期现金流。",
+        GLD: "黄金 ETF，风险对冲资产。",
+        TLT: "美国长债 ETF，利率和避险资产。"
+      };
+
+      function card(label, value, detail) {
+        return `<article class="card"><div class="label">${label}</div><div class="value">${value}</div><div class="detail">${detail}</div></article>`;
+      }
+
+      function render(payload) {
+        const meta = payload.meta || {};
+        const hero = payload.hero || {};
+        const stats = payload.stats || {};
+        document.getElementById("heroSummary").textContent = hero.summary || "--";
+        document.getElementById("heroAction").textContent = hero.action || "--";
+        document.getElementById("heroHeadline").textContent = hero.headline || "--";
+        document.getElementById("topSymbols").innerHTML = (hero.top_symbols || []).map((item) => `<span class="symbol-chip">${item}</span>`).join("");
+        document.getElementById("status").textContent = `数据源：${meta.data_source || "--"}；覆盖：${meta.coverage || "--"}；生成：${meta.generated_at || "--"}`;
+
+        document.getElementById("statsGrid").innerHTML = [
+          card("覆盖标的", `${stats.loaded_count ?? "--"} / ${stats.universe_count ?? "--"}`, "指数 ETF、科技巨头、半导体、AI、成长和防守资产。"),
+          card("强势/趋势", `${stats.attack_count ?? "--"} 只`, "信号为强势进攻或趋势持有的标的数量。"),
+          card("防守资产", `${stats.defense_count ?? "--"} 只`, "黄金、美债等用于观察风险偏好的资产。"),
+          card("平均评分", fmt(stats.avg_score, ""), "评分越高说明趋势和动量更强，但仍需结合回撤风险。"),
+        ].join("");
+
+        const training = payload.training || {};
+        const best = training.best_model || {};
+        const valid = best.validation || {};
+        const full = best.full || {};
+        const recent = best.recent_3m || {};
+        const config = best.config || {};
+        const bench = training.benchmarks || {};
+        document.getElementById("trainingGrid").innerHTML = [
+          card("训练模型", training.model_name || "--", `参数：${config.label || "--"}`),
+          card("样本外年化", fmt(valid.annual_return_pct, "%"), `验证窗口：${training.coverage?.validation_window || "--"}；最大回撤 ${fmt(valid.max_drawdown_pct, "%")}。`),
+          card("全周期表现", fmt(full.total_return_pct, "%"), `全周期最大回撤 ${fmt(full.max_drawdown_pct, "%")}；SPY 全周期 ${fmt(bench.SPY?.total_return_pct, "%")}。`),
+          card("近3个月状态", fmt(recent.total_return_pct, "%"), `近期夏普 ${fmt(recent.sharpe, "")}，这项用于识别策略是否短期降温。`),
+        ].join("");
+        document.getElementById("trainingHoldings").innerHTML = (best.current_holdings || []).map((item) => `
+          <tr>
+            <td><div class="ticker">${item.symbol}</div></td>
+            <td><strong>${fmt(item.weight_pct, "%")}</strong></td>
+            <td class="muted">由趋势动量模型在最近调仓日 ${best.latest_rebalance || "--"} 给出；需结合合规路径和个人风险承受能力。</td>
+          </tr>
+        `).join("") || `<tr><td colspan="3" class="muted">暂无训练持仓。</td></tr>`;
+
+        const strategy = payload.strategy || {};
+        document.getElementById("strategyGrid").innerHTML = [
+          card("模型", strategy.name || "--", "日线观察版，适合先判断美股风险偏好和强势方向。"),
+          card("核心因子", (strategy.factors || []).slice(0, 3).join(" / "), "后续可继续加入估值、盈利、资金流和宏观利率。"),
+          card("执行口径", "观察优先", "强势进攻不等于马上买入，必须结合合规路径、汇率、税务和自身风险承受能力。"),
+          card("下一步", "分钟级/实时源", "如要盘中交易，需要接入更稳定的实时或高频数据源。"),
+        ].join("");
+
+        document.getElementById("rows").innerHTML = (payload.rows || []).map((row) => `
+          <tr>
+            <td><div class="ticker">${row.symbol}</div><div class="muted">${row.name}<br>${row.role}</div></td>
+            <td>${row.group}</td>
+            <td><span class="signal">${row.signal}</span></td>
+            <td><strong>${fmt(row.score, "")}</strong></td>
+            <td class="${cls(row.return_3m_pct)}">${fmt(row.return_3m_pct, "%")}</td>
+            <td class="${cls(row.return_1y_pct)}">${fmt(row.return_1y_pct, "%")}</td>
+            <td class="bad">${fmt(row.max_drawdown_1y_pct, "%")}</td>
+            <td>${fmt(row.vol20_annual_pct, "%")}</td>
+            <td class="muted">现价 ${fmt(row.latest)}<br>MA20 ${fmt(row.ma20)} / MA60 ${fmt(row.ma60)} / MA120 ${fmt(row.ma120)}</td>
+            <td class="muted">${symbolHelp[row.symbol] || row.role || "用于观察美股市场结构。"}</td>
+          </tr>
+        `).join("");
+      }
+
+      async function load(force = false) {
+        const status = document.getElementById("status");
+        status.textContent = force ? "正在刷新美股数据..." : "正在读取美股看板...";
+        const response = await fetch(`/api/us-stock-board-data${force ? "?force=1" : ""}`, { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || payload.error || "读取失败");
+        render(payload);
+      }
+
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        load(true).catch((error) => {
+          document.getElementById("status").textContent = `刷新失败：${error.message}`;
+        });
+      });
+
+      load(false).catch((error) => {
+        document.getElementById("status").textContent = `读取失败：${error.message}`;
+      });
+    </script>
+  </body>
+</html>

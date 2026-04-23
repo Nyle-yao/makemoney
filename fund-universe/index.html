@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>全市场基金池</title>
+    <style>
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      :root {
+        --bg: #f4efe7;
+        --paper: rgba(255, 251, 245, 0.84);
+        --ink: #182433;
+        --muted: #607080;
+        --line: rgba(24, 36, 51, 0.09);
+        --accent: #bf5a36;
+        --accent-2: #1e6f68;
+        --good: #14825d;
+        --bad: #b64a33;
+        --shadow: 0 24px 70px rgba(66, 43, 23, 0.12);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at top left, rgba(191,90,54,0.14), transparent 24%),
+          radial-gradient(circle at top right, rgba(30,111,104,0.1), transparent 24%),
+          linear-gradient(180deg, #f7f2ea 0%, #eee6da 100%);
+      }
+      .shell {
+        max-width: 1560px;
+        margin: 0 auto;
+        padding:
+          max(14px, env(safe-area-inset-top))
+          max(14px, env(safe-area-inset-right))
+          max(20px, env(safe-area-inset-bottom))
+          max(14px, env(safe-area-inset-left));
+        padding-inline: clamp(14px, 2.4vw, 24px);
+      }
+      .board-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .board-nav-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .board-nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .board-nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(24,36,51,0.08);
+        background: rgba(255,255,255,0.72);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .board-nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #d57f58);
+        color: #fff;
+        border-color: transparent;
+      }
+      .hero, .card {
+        background: var(--paper);
+        border: 1px solid rgba(255,255,255,0.72);
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+      }
+      .hero { padding: 28px; }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+      }
+      h1 {
+        margin: 14px 0 8px;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+        font-size: clamp(38px, 5vw, 68px);
+        line-height: 0.96;
+      }
+      .subtitle { color: var(--muted); line-height: 1.7; max-width: 70ch; }
+      .pills, .filter-row, .top-picks { display: flex; flex-wrap: wrap; gap: 12px; }
+      .pills { margin-top: 18px; }
+      .pill, .filter-btn {
+        border: 1px solid rgba(24,36,51,0.07);
+        background: rgba(255,255,255,0.72);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font: inherit;
+        font-size: 13px;
+      }
+      .status-pill.error {
+        color: #fff;
+        background: linear-gradient(90deg, var(--bad), #c96b49);
+        border-color: transparent;
+      }
+      .quickstart-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .quickstart-box {
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.72);
+        padding: 18px;
+      }
+      .quickstart-box h4 {
+        margin: 8px 0 10px;
+        font-size: 22px;
+        line-height: 1.2;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+      }
+      .quickstart-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 14px;
+      }
+      .quickstart-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 14px;
+      }
+      .filter-btn { cursor: pointer; }
+      .filter-btn.active { background: linear-gradient(90deg, var(--accent), #d57f58); color: #fff; }
+      .toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(180px, 0.5fr) auto;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .search-input,
+      .sort-select {
+        width: 100%;
+        border: 1px solid rgba(24,36,51,0.09);
+        background: rgba(255,255,255,0.78);
+        border-radius: 16px;
+        padding: 12px 14px;
+        font: inherit;
+        color: var(--ink);
+      }
+      .pager {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+      .pager-meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .pager-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .pager-btn {
+        border: 1px solid rgba(24,36,51,0.08);
+        background: rgba(255,255,255,0.76);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .pager-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+      .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+      .card { padding: 22px; }
+      .span-12 { grid-column: span 12; }
+      .span-8 { grid-column: span 8; }
+      .span-4 { grid-column: span 4; }
+      .section-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 14px; }
+      .section-head h3 { margin: 8px 0 0; font-size: 28px; font-family: "Source Han Serif SC", "Songti SC", serif; }
+      .section-sub { color: var(--muted); font-size: 14px; line-height: 1.6; }
+      .stats-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+      .stat {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255,255,255,0.64);
+        border: 1px solid rgba(24,36,51,0.06);
+      }
+      .stat .v { font-size: 32px; margin-top: 10px; }
+      .cat-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+      .cat-card {
+        padding: 16px;
+        border-radius: 22px;
+        background: rgba(255,255,255,0.58);
+        border: 1px solid rgba(24,36,51,0.06);
+      }
+      .cat-card strong { display: block; font-size: 18px; }
+      .cat-card span { color: var(--muted); font-size: 13px; }
+      .pick {
+        padding: 14px 16px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.58);
+        border: 1px solid rgba(24,36,51,0.06);
+        min-width: 190px;
+      }
+      .pick .meta { color: var(--muted); font-size: 12px; }
+      .up { color: var(--good); }
+      .down { color: var(--bad); }
+      .flat { color: var(--muted); }
+      .table-wrap {
+        overflow: auto;
+        border-radius: 22px;
+        border: 1px solid rgba(24,36,51,0.06);
+        background: rgba(255,255,255,0.54);
+      }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 13px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+      th {
+        position: sticky; top: 0;
+        background: rgba(244,239,231,0.95);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .fund-name { font-weight: 700; }
+      .fund-meta { color: var(--muted); font-size: 12px; }
+      .badge {
+        display: inline-flex;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: rgba(30,111,104,0.1);
+        color: var(--accent-2);
+      }
+      .footer-link { margin-top: 14px; color: var(--muted); font-size: 13px; }
+      .footer-link a { color: var(--accent); text-decoration: none; }
+      @media (max-width: 1180px) {
+        .span-8, .span-4 { grid-column: span 12; }
+        .stats-grid, .cat-grid, .quickstart-grid { grid-template-columns: 1fr 1fr; }
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+        .toolbar {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 980px) {
+        h1 {
+          font-size: clamp(34px, 7vw, 52px);
+        }
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .shell { padding: 14px; }
+        .hero, .card { padding: 18px; border-radius: 22px; }
+        .board-nav {
+          align-items: stretch;
+        }
+        .board-nav-links {
+          width: 100%;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          padding-bottom: 4px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .board-nav-links::-webkit-scrollbar {
+          display: none;
+        }
+        .board-nav-link {
+          flex: 0 0 auto;
+          min-width: 132px;
+        }
+        .stats-grid, .cat-grid, .quickstart-grid { grid-template-columns: 1fr; }
+        .pills, .filter-row, .top-picks { gap: 8px; }
+        .pill, .filter-btn { width: 100%; justify-content: center; }
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+        .table-wrap {
+          border: 0;
+          background: transparent;
+          overflow: visible;
+        }
+        .table-wrap table,
+        .table-wrap thead,
+        .table-wrap tbody,
+        .table-wrap th,
+        .table-wrap td,
+        .table-wrap tr {
+          display: block;
+          width: 100%;
+        }
+        .table-wrap thead {
+          display: none;
+        }
+        .table-wrap tbody {
+          display: grid;
+          gap: 12px;
+        }
+        .table-wrap tr {
+          border-radius: 18px;
+          padding: 10px 12px;
+          background: rgba(255,255,255,0.68);
+          border: 1px solid rgba(24,36,51,0.08);
+        }
+        .table-wrap td {
+          border-bottom: 0;
+          white-space: normal;
+          display: grid;
+          grid-template-columns: 96px 1fr;
+          gap: 10px;
+          padding: 7px 0;
+        }
+        .table-wrap td::before {
+          content: attr(data-label);
+          color: var(--muted);
+          font-size: 12px;
+          letter-spacing: 0.04em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <nav class="board-nav" aria-label="看板跳转">
+        <div class="board-nav-label">站内导航</div>
+        <div class="board-nav-links">
+          <a class="board-nav-link" href="/fund-board">基金主台</a>
+          <a class="board-nav-link" href="/fund-dual-momentum-board">双动量独立台</a>
+          <a class="board-nav-link" href="/fund-yield-board">基金高收益台</a>
+          <a class="board-nav-link active" href="/fund-universe">全市场基金池</a>
+          <a class="board-nav-link" href="/stock-board">股票主台</a>
+          <a class="board-nav-link" href="/stock-yield-board">股票高收益台</a>
+          <a class="board-nav-link" href="/sector-board">易总行业量化</a>
+          <a class="board-nav-link" href="/us-stock-board">美股观察台</a>
+          <a class="board-nav-link" href="/delivery-log">交付说明台</a>
+        </div>
+      </nav>
+      <section class="hero">
+        <div class="eyebrow">Full Market Fund Universe</div>
+        <h1 id="title">全市场基金池</h1>
+        <div class="subtitle" id="subtitle"></div>
+        <div class="pills">
+          <span class="pill" id="asOfPill"></span>
+          <span class="pill" id="sourcePill"></span>
+          <span class="pill" id="totalPill"></span>
+          <span class="pill" id="selectedPill"></span>
+          <span class="pill status-pill" id="refreshStatusPill">等待加载</span>
+          <button class="filter-btn" id="manualRetryBtn" type="button">重试加载</button>
+        </div>
+        <div class="quickstart-grid">
+          <div class="quickstart-box">
+            <div class="section-label">这页干什么</div>
+            <h4 id="quickIntroTitle">--</h4>
+            <p id="quickIntroCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">先看哪里</div>
+            <div id="quickLookList"></div>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">当前覆盖</div>
+            <h4 id="quickCoverageTitle">--</h4>
+            <p id="quickCoverageCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">高分候选亮点</div>
+            <h4 id="quickTopPickTitle">--</h4>
+            <p id="quickTopPickCopy">--</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card span-12">
+          <div class="stats-grid" id="statsGrid"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Category Split</div>
+              <h3>全市场底池分类</h3>
+            </div>
+            <div class="section-sub">底池按全市场公募基金组织，首页只展示精选池，这里看全量结构。</div>
+          </div>
+          <div class="cat-grid" id="categoryGrid"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Top Picks</div>
+              <h3>全市场高分候选</h3>
+            </div>
+          </div>
+          <div class="top-picks" id="topPicks"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Universe Table</div>
+              <h3>全市场基金池表</h3>
+            </div>
+            <div class="filter-row" id="filterRow"></div>
+          </div>
+          <div class="toolbar">
+            <input id="searchInput" class="search-input" type="search" placeholder="搜索基金名称 / 代码 / 经理 / 风格" />
+            <select id="sortSelect" class="sort-select">
+              <option value="score_desc">按评分从高到低</option>
+              <option value="one_year_desc">按近一年收益</option>
+              <option value="drawdown_desc">按回撤更稳</option>
+              <option value="weight_desc">按目标仓位</option>
+              <option value="name_asc">按名称</option>
+            </select>
+            <div class="section-sub" style="align-self:center;">默认每页 8 只，移动端更容易浏览。</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>基金</th>
+                  <th>分类 / 风格</th>
+                  <th>经理</th>
+                  <th>评分</th>
+                  <th>近一年</th>
+                  <th>回撤</th>
+                  <th>最新价 / 估值</th>
+                  <th>涨跌幅</th>
+                  <th>动作</th>
+                  <th>目标仓位</th>
+                </tr>
+              </thead>
+              <tbody id="universeBody"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <div class="pager-meta" id="pagerMeta"></div>
+            <div class="pager-actions">
+              <button class="pager-btn" id="prevPageBtn">上一页</button>
+              <button class="pager-btn" id="nextPageBtn">下一页</button>
+            </div>
+          </div>
+          <div class="footer-link">精选工作台页：<a href="/fund-board">/fund-board</a></div>
+        </article>
+      </section>
+    </div>
+
+    <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+    <script>
+      let data = null;
+      let activeFilter = "all";
+      let currentPage = 1;
+      const pageSize = 8;
+      const refreshMs = 120000;
+      let controlsBound = false;
+      let refreshTimer = null;
+      let countdownTimer = null;
+      let refreshDeadline = null;
+      let refreshErrorActive = false;
+
+      function setRefreshStatus(text, isError = false) {
+        const node = document.getElementById("refreshStatusPill");
+        node.textContent = text;
+        node.classList.toggle("error", isError);
+        refreshErrorActive = isError;
+      }
+
+      function cacheModeText(cache) {
+        if (!cache) return "缓存状态待初始化";
+        const modeMap = {
+          fresh: "刚刷新",
+          cached: "缓存复用",
+          stale_snapshot: "快照兜底",
+          refreshing_snapshot: "后台刷新中",
+          refresh_in_progress: "后台刷新中",
+          refresh_failed_snapshot: "刷新失败已兜底",
+        };
+        const mode = modeMap[cache.mode] || cache.mode || "缓存状态";
+        return `${mode} · 已缓存 ${cache.age_seconds ?? 0}s / ${cache.ttl_seconds ?? 0}s`;
+      }
+
+      function updateCountdown() {
+        if (!refreshDeadline || refreshErrorActive) return;
+        const remain = Math.max(0, Math.ceil((refreshDeadline - Date.now()) / 1000));
+        const cacheText = data?._cache ? `${cacheModeText(data._cache)} · ` : "";
+        setRefreshStatus(`${cacheText}下次自动刷新 ${remain}s`, false);
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, ms));
+      }
+
+      function pct(v, digits = 1) {
+        const n = Number(v);
+        return `${n > 0 ? "+" : ""}${n.toFixed(digits)}%`;
+      }
+
+      function fmtPrice(v) {
+        if (v === null || v === undefined || Number.isNaN(Number(v))) return "--";
+        const n = Number(v);
+        return n < 10 ? n.toFixed(3) : n.toFixed(2);
+      }
+
+      function fmtPctNullable(v, digits = 1) {
+        if (v === null || v === undefined || Number.isNaN(Number(v))) return "--";
+        return pct(v, digits);
+      }
+
+      function tone(value) {
+        if (value === null || value === undefined || Number(value) === 0) return "flat";
+        return Number(value) > 0 ? "up" : "down";
+      }
+
+      function renderMeta() {
+        document.getElementById("title").textContent = data.universe_summary.title;
+        document.getElementById("subtitle").textContent = data.universe_summary.description;
+        document.getElementById("asOfPill").textContent = `截至 ${data.meta.as_of}`;
+        document.getElementById("sourcePill").textContent = `数据源 ${data.meta.data_source}`;
+        document.getElementById("totalPill").textContent = `全市场结构 ${data.universe_summary.total_count} 只`;
+        document.getElementById("selectedPill").textContent = `当前已加载 ${data.universe_summary.loaded_count ?? data.universe_rows.length} 只`;
+      }
+
+      function renderStats() {
+        const stats = [
+          ["全市场结构", `${data.universe_summary.total_count}`, "这是全市场公募基金规模，不代表前端当前已全量加载"],
+          ["当前已加载", `${data.universe_summary.loaded_count ?? data.universe_rows.length}`, "当前页面真正装进来的基金数量"],
+          ["首页精选表", `${data.universe_summary.home_table_count ?? "--"}`, "首页“全部”页签当前展示的精选数量"],
+          ["策略跟踪池", `${data.universe_summary.selected_count}`, "进入策略比较与看板跟踪的基金数量"],
+          ["资讯触发", `${data.news_flash.length}`, "结合计划一起看"],
+        ];
+        document.getElementById("statsGrid").innerHTML = stats.map(([k, v, d]) => `
+          <div class="stat">
+            <div class="fund-meta">${k}</div>
+            <div class="v">${v}</div>
+            <div class="fund-meta">${d}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderQuickGuide() {
+        const topPick = data.universe_top_picks?.[0] || {};
+        const loaded = data.universe_summary.loaded_count ?? data.universe_rows.length;
+        const lookList = [
+          "先看高分候选和分类结构，判断现在全市场偏什么风格。",
+          "再用搜索和筛选，把你关心的赛道或基金经理筛出来。",
+          "最后回基金主台，把这里看到的高分候选和正式执行策略对照起来。",
+        ];
+        document.getElementById("quickIntroTitle").textContent = "全市场发现页";
+        document.getElementById("quickIntroCopy").textContent = "这页不是直接下单页，而是把全市场基金底池、分类结构和高分候选集中起来，帮助你发现哪些基金值得进入正式决策视野。";
+        document.getElementById("quickLookList").innerHTML = `<ol class="quickstart-list">${lookList.map((item) => `<li>${item}</li>`).join("")}</ol>`;
+        document.getElementById("quickCoverageTitle").textContent = `${loaded} / ${data.universe_summary.total_count}`;
+        document.getElementById("quickCoverageCopy").textContent = `当前页面已加载 ${loaded} 只基金，策略跟踪池 ${data.universe_summary.selected_count} 只。这里更适合做发现和筛选，不直接替代执行台。`;
+        document.getElementById("quickTopPickTitle").textContent = topPick.name || "--";
+        document.getElementById("quickTopPickCopy").textContent = topPick.name ? `评分 ${topPick.score?.toFixed(1) || "--"} / 近一年 ${fmtPctNullable(topPick.one_year)} / 目标仓位 ${topPick.target_weight ?? "--"}%。这是当前全市场最值得先点开的高分候选之一。` : "当前没有可展示的高分候选。";
+      }
+
+      function renderCategories() {
+        document.getElementById("categoryGrid").innerHTML = data.universe_summary.categories.map((item) => `
+          <div class="cat-card">
+            <strong>${item.name}</strong>
+            <span>全市场 ${item.count} 只</span><br />
+            <span>精选纳入 ${item.selected} 只</span>
+          </div>
+        `).join("");
+      }
+
+      function renderTopPicks() {
+        document.getElementById("topPicks").innerHTML = data.universe_top_picks.map((item) => `
+          <div class="pick">
+            <div class="fund-name">${item.name}</div>
+            <div class="meta">${item.code} · ${item.category}</div>
+            <div style="margin-top:8px;">评分 ${item.score.toFixed(1)} · 目标 ${item.target_weight}%</div>
+            <div class="${tone(item.change_pct)}" style="margin-top:6px;">${fmtPrice(item.last_price)} / ${item.change_pct == null ? "--" : pct(item.change_pct, 2)}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderFilters() {
+        document.getElementById("filterRow").innerHTML = data.universe_filters.map((item) => `
+          <button class="filter-btn ${item.id === activeFilter ? "active" : ""}" data-filter="${item.id}">${item.name}</button>
+        `).join("");
+        document.querySelectorAll(".filter-btn").forEach((button) => {
+          button.addEventListener("click", () => {
+            activeFilter = button.dataset.filter;
+            currentPage = 1;
+            renderFilters();
+            renderUniverseTable();
+          });
+        });
+      }
+
+      function getFilteredRows() {
+        const keyword = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+        const sortMode = document.getElementById("sortSelect")?.value || "score_desc";
+        let rows = data.universe_rows.filter((row) => row.tags.includes(activeFilter));
+        if (keyword) {
+          rows = rows.filter((row) => {
+            const haystack = `${row.name} ${row.code} ${row.manager} ${row.style} ${row.category}`.toLowerCase();
+            return haystack.includes(keyword);
+          });
+        }
+        rows = rows.slice().sort((a, b) => {
+          if (sortMode === "one_year_desc") return Number(b.one_year || 0) - Number(a.one_year || 0);
+          if (sortMode === "drawdown_desc") return Number(b.drawdown || 0) - Number(a.drawdown || 0);
+          if (sortMode === "weight_desc") return Number(b.target_weight || 0) - Number(a.target_weight || 0);
+          if (sortMode === "name_asc") return String(a.name).localeCompare(String(b.name), "zh-CN");
+          return Number(b.score || 0) - Number(a.score || 0);
+        });
+        return rows;
+      }
+
+      function renderUniverseTable() {
+        const rows = getFilteredRows();
+        const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+        currentPage = Math.min(currentPage, totalPages);
+        const start = (currentPage - 1) * pageSize;
+        const pageRows = rows.slice(start, start + pageSize);
+        document.getElementById("universeBody").innerHTML = pageRows.map((row) => `
+          <tr>
+            <td data-label="基金">
+              <div class="fund-name">${row.name}</div>
+              <div class="fund-meta">${row.code} · ${row.realtime_tag}</div>
+            </td>
+            <td data-label="分类 / 风格">
+              <div>${row.category}</div>
+              <div class="fund-meta">${row.style}</div>
+            </td>
+            <td data-label="经理">${row.manager}</td>
+            <td data-label="评分">${row.score.toFixed(1)}</td>
+            <td data-label="近一年" class="${row.one_year == null ? "flat" : row.one_year >= 0 ? "up" : "down"}">${fmtPctNullable(row.one_year)}</td>
+            <td data-label="回撤" class="${row.drawdown == null ? "flat" : row.drawdown >= 0 ? "up" : "down"}">${fmtPctNullable(row.drawdown)}</td>
+            <td data-label="最新价 / 估值">${fmtPrice(row.last_price)}</td>
+            <td data-label="涨跌幅" class="${tone(row.change_pct)}">${row.change_pct == null ? "--" : pct(row.change_pct, 2)}</td>
+            <td data-label="动作"><span class="badge">${row.signal}</span></td>
+            <td data-label="目标仓位">${row.target_weight}%</td>
+          </tr>
+        `).join("");
+        document.getElementById("pagerMeta").textContent = `共 ${rows.length} 只 · 第 ${currentPage} / ${totalPages} 页`;
+        document.getElementById("prevPageBtn").disabled = currentPage <= 1;
+        document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
+      }
+
+      function renderAll() {
+        if (!data) return;
+        renderMeta();
+        renderQuickGuide();
+        renderStats();
+        renderCategories();
+        renderTopPicks();
+        renderFilters();
+        renderUniverseTable();
+      }
+
+      function bindControls() {
+        if (controlsBound) return;
+        controlsBound = true;
+        document.getElementById("searchInput").addEventListener("input", () => {
+          currentPage = 1;
+          renderUniverseTable();
+        });
+        document.getElementById("sortSelect").addEventListener("change", () => {
+          currentPage = 1;
+          renderUniverseTable();
+        });
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+          currentPage = Math.max(1, currentPage - 1);
+          renderUniverseTable();
+        });
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+          currentPage += 1;
+          renderUniverseTable();
+        });
+        document.getElementById("manualRetryBtn").addEventListener("click", async () => {
+          const button = document.getElementById("manualRetryBtn");
+          button.disabled = true;
+          button.textContent = "正在刷新…";
+          try {
+            await loadData(true);
+          } finally {
+            button.disabled = false;
+            button.textContent = "重试加载";
+          }
+        });
+      }
+
+      async function fetchDynamicData(force = false) {
+        const delays = [0, 700, 1600];
+        let lastError = null;
+        for (let index = 0; index < delays.length; index += 1) {
+          if (delays[index]) {
+            setRefreshStatus(`连接重试中 ${index + 1}/${delays.length}…`, true);
+            await sleep(delays[index]);
+          }
+          try {
+            const suffix = force ? "?force=1" : `?ts=${Date.now()}`;
+            const response = await fetch(`/api/fund-universe-data${suffix}`, { cache: "no-store" });
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            return await response.json();
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error("连接失败");
+      }
+
+      async function loadData(force = false) {
+        setRefreshStatus(force ? "正在强制刷新…" : "正在加载…", false);
+        try {
+          data = await fetchDynamicData(force);
+          renderAll();
+          refreshDeadline = Date.now() + refreshMs;
+          updateCountdown();
+        } catch (error) {
+          setRefreshStatus(`刷新失败：${error.message}`, true);
+        }
+      }
+
+      function startAutoRefresh() {
+        clearInterval(refreshTimer);
+        clearInterval(countdownTimer);
+        refreshTimer = window.setInterval(() => loadData(false), refreshMs);
+        countdownTimer = window.setInterval(updateCountdown, 1000);
+      }
+
+      async function init() {
+        bindControls();
+        await loadData(false);
+        startAutoRefresh();
+      }
+
+      init();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>易总教的行业量化</title>
+    <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #667085;
+        --line: rgba(23, 32, 51, 0.12);
+        --paper: #fffaf2;
+        --card: rgba(255, 255, 255, 0.86);
+        --accent: #c9663f;
+        --accent-2: #176b67;
+        --gold: #c49a46;
+        --danger: #b94a38;
+        --good: #d33b2f;
+        --bad: #1f8a5b;
+        --shadow: 0 24px 80px rgba(45, 38, 28, 0.12);
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 8% 12%, rgba(201, 102, 63, 0.22), transparent 28%),
+          radial-gradient(circle at 92% 6%, rgba(23, 107, 103, 0.16), transparent 30%),
+          linear-gradient(135deg, #f8efe4 0%, #f6f8ed 45%, #eef5f7 100%);
+        font-family: "Songti SC", "Noto Serif CJK SC", Georgia, serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .page { width: min(1480px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 54px; }
+      .board-nav { display: flex; gap: 18px; align-items: center; padding: 22px 0 30px; }
+      .board-nav-label { color: var(--muted); font: 700 15px/1 "PingFang SC", sans-serif; letter-spacing: 0.2em; white-space: nowrap; }
+      .board-nav-links { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+      .board-nav-link {
+        flex: 0 0 auto;
+        text-decoration: none;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 12px 22px;
+        box-shadow: 0 10px 24px rgba(23, 32, 51, 0.08);
+        font: 700 15px/1 "PingFang SC", sans-serif;
+        touch-action: manipulation;
+      }
+      .board-nav-link.active { color: #fff; background: var(--accent); border-color: transparent; }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 46px 46px 36px;
+        background: rgba(255, 250, 242, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: var(--shadow);
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 360px;
+        height: 220px;
+        right: -70px;
+        top: 40px;
+        border-radius: 80px;
+        background: #172033;
+        transform: rotate(-2deg);
+      }
+      .eyebrow { color: var(--accent-2); letter-spacing: 0.4em; font: 700 14px/1 "PingFang SC", sans-serif; text-transform: uppercase; }
+      h1 { margin: 18px 0 12px; font-size: clamp(48px, 7vw, 104px); line-height: 0.96; letter-spacing: -0.06em; }
+      .hero p { max-width: 900px; color: var(--muted); font: 500 18px/1.8 "PingFang SC", sans-serif; }
+      .hero-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 26px; position: relative; z-index: 1; }
+      .metric { border: 1px solid var(--line); background: rgba(255,255,255,.76); border-radius: 22px; padding: 18px; }
+      .metric b { display: block; font-size: 28px; margin-bottom: 8px; }
+      .metric span { color: var(--muted); font: 700 13px/1.5 "PingFang SC", sans-serif; }
+      .section { margin-top: 28px; border-radius: 30px; background: var(--card); border: 1px solid rgba(255,255,255,.78); box-shadow: var(--shadow); padding: 28px; }
+      .section-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+      .section h2 { margin: 0; font-size: clamp(28px, 4vw, 48px); letter-spacing: -0.04em; }
+      .section-note { max-width: 720px; color: var(--muted); font: 500 15px/1.8 "PingFang SC", sans-serif; }
+      .rule-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+      .rule { border-radius: 18px; padding: 14px 16px; background: rgba(23, 107, 103, 0.08); color: #24514e; font: 700 13px/1.6 "PingFang SC", sans-serif; }
+      table { width: 100%; border-collapse: separate; border-spacing: 0 10px; font-family: "PingFang SC", sans-serif; }
+      th { color: var(--muted); font-size: 12px; text-align: left; padding: 0 12px; white-space: nowrap; }
+      td { background: rgba(255,255,255,.8); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 12px; vertical-align: top; font-size: 14px; }
+      td:first-child { border-left: 1px solid var(--line); border-radius: 16px 0 0 16px; }
+      td:last-child { border-right: 1px solid var(--line); border-radius: 0 16px 16px 0; }
+      .name { font-weight: 900; font-size: 16px; }
+      .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+      .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 800; background: rgba(23,32,51,.08); color: var(--ink); white-space: nowrap; }
+      .pill.buy, .pill.good { background: rgba(211,59,47,.14); color: var(--good); }
+      .pill.wait { background: rgba(196,154,70,.16); color: #8a6418; }
+      .pill.defense { background: rgba(31,138,91,.14); color: var(--bad); }
+      .pill.missing { background: rgba(100,116,139,.13); color: #64748b; }
+      .two-col { display: grid; grid-template-columns: 1.05fr .95fr; gap: 20px; }
+      .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+      .weather-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 18px 0 22px; }
+      .leader-visual-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 22px; }
+      .leader-card {
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,.78);
+        border-radius: 24px;
+        padding: 18px;
+        box-shadow: 0 16px 42px rgba(23, 32, 51, 0.08);
+        font-family: "PingFang SC", sans-serif;
+      }
+      .leader-card.buy { border-color: rgba(211,59,47,.32); background: linear-gradient(135deg, rgba(211,59,47,.16), rgba(255,255,255,.82)); }
+      .leader-card.defense { border-color: rgba(31,138,91,.30); background: linear-gradient(135deg, rgba(31,138,91,.14), rgba(255,255,255,.82)); }
+      .leader-card.wait { border-color: rgba(196,154,70,.30); background: linear-gradient(135deg, rgba(196,154,70,.15), rgba(255,255,255,.82)); }
+      .leader-card.missing { border-color: rgba(100,116,139,.25); background: linear-gradient(135deg, rgba(100,116,139,.13), rgba(255,255,255,.82)); }
+      .leader-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+      .leader-score { font-size: 30px; font-weight: 900; color: var(--good); line-height: 1; }
+      .leader-card.defense .leader-score { color: var(--bad); }
+      .leader-card.missing .leader-score { color: #64748b; }
+      .gauge { height: 9px; border-radius: 999px; background: rgba(23,32,51,.10); overflow: hidden; margin: 16px 0 12px; }
+      .gauge span { display: block; height: 100%; border-radius: inherit; background: var(--good); }
+      .leader-card.defense .gauge span { background: var(--bad); }
+      .leader-card.wait .gauge span { background: var(--gold); }
+      .leader-card.missing .gauge span { background: #94a3b8; }
+      .leader-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+      .leader-mini div { border-radius: 14px; background: rgba(255,255,255,.66); padding: 8px; }
+      .leader-mini b { display: block; font-size: 14px; }
+      .leader-mini span { color: var(--muted); font-size: 11px; }
+      .logic-map { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0 8px; }
+      .logic-card { border: 1px solid var(--line); background: rgba(255,255,255,.74); border-radius: 20px; padding: 14px; font-family: "PingFang SC", sans-serif; }
+      .logic-card b { display: block; font-size: 16px; margin-bottom: 6px; }
+      .logic-card span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .weather-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        padding: 18px;
+        color: #fff;
+        min-height: 172px;
+        box-shadow: 0 22px 58px rgba(23, 32, 51, 0.14);
+        font-family: "PingFang SC", sans-serif;
+      }
+      .weather-card::after {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        right: -48px;
+        top: -42px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.18);
+      }
+      .weather-card.sunny { background: linear-gradient(135deg, #d33b2f, #f06a3a); }
+      .weather-card.cloudy { background: linear-gradient(135deg, #c58b28, #d8a847); }
+      .weather-card.overcast { background: linear-gradient(135deg, #64748b, #475569); }
+      .weather-card.storm { background: linear-gradient(135deg, #1f8a5b, #0f5f45); }
+      .weather-card.missing { background: linear-gradient(135deg, #94a3b8, #64748b); }
+      .weather-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 18px 0 4px;
+        font-family: "PingFang SC", sans-serif;
+      }
+      .weather-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(211,59,47,.12);
+        color: var(--good);
+        font-size: 13px;
+        font-weight: 900;
+      }
+      .weather-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; position: relative; z-index: 1; }
+      .weather-name { font-size: 18px; font-weight: 900; }
+      .weather-label { font-size: 28px; font-weight: 900; letter-spacing: -0.04em; }
+      .weather-action { margin-top: 18px; font-size: 22px; font-weight: 900; position: relative; z-index: 1; }
+      .weather-wind { margin-top: 6px; opacity: .9; font-size: 13px; font-weight: 800; position: relative; z-index: 1; }
+      .weather-bar { height: 9px; border-radius: 999px; background: rgba(255,255,255,.26); overflow: hidden; margin-top: 16px; position: relative; z-index: 1; }
+      .weather-bar span { display: block; height: 100%; background: rgba(255,255,255,.9); border-radius: inherit; }
+      .weather-meaning { margin-top: 12px; opacity: .92; font-size: 12px; line-height: 1.5; position: relative; z-index: 1; }
+      .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; position: relative; z-index: 1; }
+      .tag { border-radius: 999px; padding: 4px 8px; background: rgba(255,255,255,.22); color: rgba(255,255,255,.94); font-size: 11px; font-weight: 800; }
+      .info-card { border-radius: 22px; padding: 18px; background: rgba(255,255,255,.76); border: 1px solid var(--line); font-family: "PingFang SC", sans-serif; }
+      .info-card h3 { margin: 0 0 10px; font-size: 17px; }
+      .info-card p, .info-card li { color: var(--muted); line-height: 1.7; font-size: 13px; }
+      .status { margin-top: 16px; font: 700 13px/1.5 "PingFang SC", sans-serif; color: var(--muted); }
+      .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        color: #fff;
+        background: var(--ink);
+        font: 800 14px/1 "PingFang SC", sans-serif;
+        cursor: pointer;
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      button.secondary { background: var(--accent-2); }
+      @media (max-width: 1200px) {
+        .weather-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .leader-visual-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .logic-map { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      @media (max-width: 1000px) {
+        .page { width: min(100% - 24px, 1480px); }
+        .board-nav {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 12px 0 16px;
+          background: linear-gradient(180deg, rgba(248,239,228,.96), rgba(248,239,228,.78));
+          backdrop-filter: blur(14px);
+        }
+        .board-nav-links {
+          width: 100%;
+          gap: 8px;
+          padding: 2px 2px 8px;
+          scroll-snap-type: x proximity;
+          -webkit-overflow-scrolling: touch;
+        }
+        .board-nav-link {
+          scroll-snap-align: start;
+          padding: 10px 14px;
+          font-size: 13px;
+        }
+        .hero, .section { padding: 22px; border-radius: 24px; }
+        .hero::after { display:none; }
+        .hero-grid, .rule-list, .weather-grid, .leader-visual-grid, .logic-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .cards, .two-col { grid-template-columns: 1fr; }
+        .section-head, .weather-toolbar { flex-direction: column; align-items: flex-start; }
+        table {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          white-space: normal;
+          -webkit-overflow-scrolling: touch;
+        }
+        thead, tbody {
+          display: table;
+          min-width: 860px;
+          width: 100%;
+        }
+        th, td { white-space: normal; }
+      }
+      @media (max-width: 640px) {
+        .page { width: calc(100% - 18px); padding: 10px 0 38px; }
+        .board-nav-label { font-size: 12px; letter-spacing: .16em; }
+        .board-nav-link { padding: 9px 12px; font-size: 12px; }
+        .hero {
+          padding: 18px;
+          border-radius: 22px;
+        }
+        .eyebrow { font-size: 11px; letter-spacing: .22em; }
+        h1 {
+          margin: 12px 0 8px;
+          font-size: clamp(38px, 15vw, 58px);
+          line-height: 1;
+        }
+        .hero p {
+          font-size: 14px;
+          line-height: 1.7;
+        }
+        .hero-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+        .metric { padding: 12px; border-radius: 18px; }
+        .metric b { font-size: 20px; line-height: 1.1; }
+        .metric span { font-size: 11px; }
+        .section {
+          margin-top: 18px;
+          padding: 16px;
+          border-radius: 22px;
+        }
+        .section h2 { font-size: clamp(26px, 9vw, 36px); }
+        .section-note { font-size: 13px; line-height: 1.7; }
+        .rule-list, .cards, .weather-grid, .leader-visual-grid, .logic-map { grid-template-columns: 1fr; }
+        .weather-card { min-height: 164px; padding: 16px; border-radius: 22px; }
+        .weather-name { font-size: 17px; }
+        .weather-label { font-size: 26px; }
+        .weather-action { font-size: 20px; }
+        .leader-card { padding: 15px; border-radius: 22px; }
+        .leader-top { gap: 8px; }
+        .leader-score { font-size: 24px; }
+        .leader-mini { grid-template-columns: 1fr; }
+        .toolbar { display: grid; grid-template-columns: 1fr; }
+        .toolbar button { width: 100%; justify-content: center; }
+        thead, tbody { min-width: 760px; }
+        th { font-size: 11px; padding: 0 10px; }
+        td { font-size: 13px; padding: 12px 10px; }
+      }
+      @media (max-width: 430px) {
+        .hero-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="board-nav">
+        <div class="board-nav-label">站内导航</div>
+        <div class="board-nav-links">
+          <a class="board-nav-link" href="/fund-board">基金主台</a>
+          <a class="board-nav-link" href="/fund-dual-momentum-board">双动量独立台</a>
+          <a class="board-nav-link" href="/fund-yield-board">基金高收益台</a>
+          <a class="board-nav-link" href="/fund-universe">全市场基金池</a>
+          <a class="board-nav-link" href="/stock-board">股票主台</a>
+          <a class="board-nav-link" href="/stock-yield-board">股票高收益台</a>
+          <a class="board-nav-link active" href="/sector-board">易总行业量化</a>
+          <a class="board-nav-link" href="/us-stock-board">美股观察台</a>
+          <a class="board-nav-link" href="/delivery-log">交付说明台</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="eyebrow">Sector Signal Lab</div>
+        <h1>易总教的行业量化</h1>
+        <p id="hero-subtitle">上半区严格按领导要求做指数预测；下半区加入优化后的板块风向标，方便对比。</p>
+        <div class="hero-grid">
+          <div class="metric"><b id="headline-action">--</b><span>当前优化层总动作</span></div>
+          <div class="metric"><b id="headline-target">--</b><span>优先观察方向</span></div>
+          <div class="metric"><b id="coverage">--</b><span>领导清单历史数据覆盖</span></div>
+          <div class="metric"><b id="updated-at">--</b><span>最新生成时间</span></div>
+        </div>
+        <div class="toolbar">
+          <button onclick="loadBoard(true)">刷新/重算</button>
+          <button class="secondary" onclick="window.location.href='/delivery-log'">查看交付说明</button>
+        </div>
+        <div class="status" id="status">加载中...</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>A区：完全按易总原始要求</h2>
+            <div class="section-note">只看他点名的宽基、策略指数和行业主题。目标是未来22个交易日是否超过阈值，训练/验证不重叠；缺数据时不输出买入信号。</div>
+          </div>
+        </div>
+        <div class="leader-visual-grid" id="leader-visual-grid"></div>
+        <div class="rule-list" id="leader-rules"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>观察对象</th>
+              <th>22日阈值</th>
+              <th>预测</th>
+              <th>信号</th>
+              <th>关键因子</th>
+              <th>不重叠验证</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody id="leader-body"></tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>B区：优化版板块风向标</h2>
+            <div class="section-note">在原始口径基础上，增加市场阶段、相对强弱、回撤/拥挤、失效条件和可执行性。这里用于和A区对比，不盲目追求信号数量。</div>
+          </div>
+        </div>
+        <div class="rule-list" id="optimized-rules"></div>
+        <div class="logic-map" id="logic-map"></div>
+        <div class="weather-toolbar">
+          <div class="weather-count" id="weather-count">风向标加载中</div>
+          <div class="sub">按优化综合评分排序，全量展示；红色代表进攻/上涨占优，绿色代表防守/下跌风险。</div>
+        </div>
+        <div class="weather-grid" id="weather-grid"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>方向</th>
+              <th>观察层</th>
+              <th>优化动作</th>
+              <th>评分</th>
+              <th>风险闸门</th>
+              <th>指标组</th>
+              <th>对比A区</th>
+              <th>为什么</th>
+            </tr>
+          </thead>
+          <tbody id="optimized-body"></tbody>
+        </table>
+      </section>
+
+      <section class="section two-col">
+        <div>
+          <h2>数据与字段</h2>
+          <div class="cards" id="data-plan"></div>
+        </div>
+        <div>
+          <h2>市场上下文</h2>
+          <div class="cards" id="market-context"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function fmt(value, suffix = "") {
+        if (value === null || value === undefined || value === "") return "--";
+        return `${value}${suffix}`;
+      }
+      function pillClass(text) {
+        if (!text) return "";
+        if (text.includes("买入") || text.includes("进攻") || text.includes("通过")) return "buy";
+        if (text.includes("待补") || text.includes("缺")) return "missing";
+        if (text.includes("防") || text.includes("收紧")) return "defense";
+        if (text.includes("等待") || text.includes("观察")) return "wait";
+        return "";
+      }
+      function renderRules(id, rules) {
+        document.getElementById(id).innerHTML = (rules || []).map(rule => `<div class="rule">${rule}</div>`).join("");
+      }
+      function metricsText(metrics) {
+        if (!metrics) return "未落库";
+        return [
+          `20日 ${fmt(metrics.mom20, "%")}`,
+          `60日 ${fmt(metrics.mom60, "%")}`,
+          `相对 ${fmt(metrics.relative60, "%")}`,
+          `回撤 ${fmt(metrics.drawdown60, "%")}`,
+          `波动 ${fmt(metrics.vol20, "%")}`,
+          `突破 ${fmt(metrics.breakout60, "%")}`
+        ].join("<br>");
+      }
+      function validationText(v) {
+        if (!v || !v.available) return v?.reason || "不可验证";
+        return [
+          `训练：${v.train_window}`,
+          `验证：${v.validation_window}`,
+          `信号数：${v.validation_signal_count}`,
+          `命中率：${v.validation_hit_rate}%`,
+          `均值：${v.validation_avg_forward_return}%`
+        ].join("<br>");
+      }
+      function renderLeader(rows) {
+        document.getElementById("leader-body").innerHTML = (rows || []).map(row => `
+          <tr>
+            <td><div class="name">${row.name}</div><div class="sub">${row.category} · ${row.primary_code}${row.used_code ? " · 使用 " + row.used_code : ""}</div></td>
+            <td>${row.threshold_22}%<div class="sub">60日 ${row.threshold_60}%</div></td>
+            <td>${fmt(row.probability_22, "%")}<div class="sub">22日预期 ${fmt(row.expected_return_22, "%")}<br>60日预期 ${fmt(row.expected_return_60, "%")}</div></td>
+            <td><span class="pill ${pillClass(row.signal)}">${row.signal}</span><div class="sub">${row.data_ready ? "数据就绪" : "相关候选 " + row.candidate_count_in_universe + " 个，待补历史"}</div></td>
+            <td>${metricsText(row.metrics)}</td>
+            <td>${validationText(row.validation)}</td>
+            <td>${row.reason}<div class="sub">${row.leader_objective}</div></td>
+          </tr>
+        `).join("");
+      }
+      function renderLeaderVisual(rows) {
+        document.getElementById("leader-visual-grid").innerHTML = (rows || []).map(row => {
+          const signalClassName = pillClass(row.signal) || "wait";
+          const prob = Math.max(0, Math.min(100, Number(row.probability_22 || 0)));
+          const expected = Number(row.expected_return_22 || 0);
+          const gap = row.expected_return_22 == null ? null : Number(row.expected_return_22) - Number(row.threshold_22 || 0);
+          return `
+            <div class="leader-card ${signalClassName}">
+              <div class="leader-top">
+                <div>
+                  <div class="name">${row.name}</div>
+                  <div class="sub">${row.category}${row.used_code ? " · " + row.used_code : ""}</div>
+                </div>
+                <div class="leader-score">${row.probability_22 == null ? "--" : row.probability_22 + "%"}</div>
+              </div>
+              <div class="gauge"><span style="width:${prob}%"></span></div>
+              <span class="pill ${signalClassName}">${row.signal}</span>
+              <div class="leader-mini">
+                <div><b>${fmt(row.expected_return_22, "%")}</b><span>22日预期</span></div>
+                <div><b>${fmt(row.threshold_22, "%")}</b><span>触发阈值</span></div>
+                <div><b>${gap === null ? "--" : (gap >= 0 ? "+" : "") + gap.toFixed(2) + "%"}</b><span>阈值差</span></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+      function renderLogicMap(rows) {
+        const groups = {};
+        (rows || []).forEach(row => {
+          const key = row.observation_layer || row.category || "未分组";
+          if (!groups[key]) groups[key] = { total: 0, attack: 0, observe: 0, defense: 0, best: null };
+          groups[key].total += 1;
+          if ((row.action || "").includes("进攻")) groups[key].attack += 1;
+          if ((row.action || "").includes("观察")) groups[key].observe += 1;
+          if ((row.action || "").includes("防")) groups[key].defense += 1;
+          if (!groups[key].best || Number(row.optimized_score || 0) > Number(groups[key].best.optimized_score || 0)) groups[key].best = row;
+        });
+        document.getElementById("logic-map").innerHTML = Object.entries(groups).map(([key, item]) => `
+          <div class="logic-card">
+            <b>${key}</b>
+            <span>${item.total} 个指标 · 进攻 ${item.attack} · 观察 ${item.observe} · 防守 ${item.defense}<br>当前最强：${item.best?.name || "--"} (${fmt(item.best?.optimized_score)})</span>
+          </div>
+        `).join("");
+      }
+      function renderOptimized(rows) {
+        document.getElementById("optimized-body").innerHTML = (rows || []).map(row => `
+          <tr>
+            <td><div class="name">${row.name}</div><div class="sub">${row.category}${row.used_code ? " · " + row.used_code : ""}</div></td>
+            <td>${row.observation_layer || row.category || "--"}</td>
+            <td><span class="pill ${pillClass(row.action)}">${row.action}</span></td>
+            <td>${fmt(row.optimized_score)}</td>
+            <td><span class="pill ${pillClass(row.risk_gate)}">${row.risk_gate}</span></td>
+            <td>${(row.factor_tags || []).join("<br>") || "--"}<div class="sub">趋势 ${row.factor_scores?.trend ?? "--"} · 动量 ${row.factor_scores?.momentum ?? "--"} · 风控 ${row.factor_scores?.risk_control ?? "--"}</div></td>
+            <td>${row.leader_signal}</td>
+            <td>${row.why}</td>
+          </tr>
+        `).join("");
+      }
+      function renderWeather(rows) {
+        const selected = rows || [];
+        document.getElementById("weather-count").textContent = `全量风向标 ${selected.length} 个`;
+        document.getElementById("weather-grid").innerHTML = selected.map(row => {
+          const weather = row.weather || { level: "missing", label: "缺数", temperature: 0, wind: "补数风", meaning: "缺少数据" };
+          const temp = Math.max(0, Math.min(100, Number(weather.temperature || 0)));
+          const tags = (row.factor_tags || []).slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join("");
+          const layer = row.observation_layer || row.category || "观察层";
+          return `
+            <div class="weather-card ${weather.level}">
+              <div class="weather-top">
+                <div>
+                  <div class="weather-name">${row.name}</div>
+                  <div class="sub" style="color:rgba(255,255,255,.78)">${layer}${row.used_code ? " · " + row.used_code : ""}</div>
+                </div>
+                <div class="weather-label">${weather.label}</div>
+              </div>
+              <div class="weather-action">${row.action}</div>
+              <div class="weather-wind">${weather.wind} · 评分 ${fmt(row.optimized_score)}</div>
+              <div class="weather-bar"><span style="width:${temp}%"></span></div>
+              <div class="tag-row">${tags}</div>
+              <div class="weather-meaning">${weather.meaning}</div>
+            </div>
+          `;
+        }).join("");
+      }
+      function renderDataPlan(plan) {
+        const fields = (plan?.fields_needed || []).map(x => `<li>${x}</li>`).join("");
+        const priority = (plan?.priority || []).map(x => `<li>${x}</li>`).join("");
+        document.getElementById("data-plan").innerHTML = `
+          <div class="info-card"><h3>需要字段</h3><ul>${fields}</ul></div>
+          <div class="info-card"><h3>补数优先级</h3><ul>${priority}</ul></div>
+          <div class="info-card"><h3>口径纪律</h3><p>缺数据时只显示缺口，不给买入信号；等历史日线、成交额和验证样本齐了，再升级为正式策略。</p></div>
+        `;
+      }
+      function renderMarketContext(ctx) {
+        const items = [
+          ["数据源", ctx?.source],
+          ["股票主台信号", ctx?.stock_main_signal_score],
+          ["股票主台YTD", fmt(ctx?.stock_main_ytd_return, "%")],
+          ["股票主台回撤", fmt(ctx?.stock_main_max_drawdown, "%")],
+          ["高收益动作", ctx?.stock_yield_action || "--"],
+        ];
+        document.getElementById("market-context").innerHTML = items.map(([k,v]) => `<div class="info-card"><h3>${k}</h3><p>${v ?? "--"}</p></div>`).join("");
+      }
+      async function loadBoard(force = false) {
+        const status = document.getElementById("status");
+        status.textContent = force ? "正在刷新与重算..." : "正在读取本地快照...";
+        try {
+          const res = await fetch(`/api/sector-board-data${force ? "?force=1" : ""}`, { cache: "no-store" });
+          const data = await res.json();
+          document.getElementById("hero-subtitle").textContent = data.hero?.subtitle || "";
+          document.getElementById("headline-action").textContent = data.hero?.headline_action || "--";
+          document.getElementById("headline-target").textContent = data.hero?.headline_target || "--";
+          document.getElementById("coverage").textContent = data.hero?.coverage || data.meta?.coverage || "--";
+          document.getElementById("updated-at").textContent = data.meta?.generated_at || "--";
+          renderRules("leader-rules", data.leader_original?.rules);
+          renderLeaderVisual(data.leader_original?.rows);
+          renderLeader(data.leader_original?.rows);
+          renderRules("optimized-rules", data.codex_optimized?.rules);
+          renderLogicMap(data.codex_optimized?.rows);
+          renderWeather(data.codex_optimized?.rows);
+          renderOptimized(data.codex_optimized?.rows);
+          renderDataPlan(data.data_plan);
+          renderMarketContext(data.codex_optimized?.market_context);
+          status.textContent = data.hero?.data_warning || "加载完成";
+        } catch (err) {
+          status.textContent = `加载失败：${err.message}`;
+        }
+      }
+      loadBoard(false);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>基金组合决策台-双动量轮动</title>
+  <style>
+    :root {
+      --bg: #f6efe7;
+      --panel: #fffaf4;
+      --panel-soft: #f3ecdf;
+      --ink: #223044;
+      --muted: #6d7a89;
+      --line: rgba(34, 48, 68, 0.12);
+      --accent: #c87541;
+      --accent-dark: #ae5f31;
+      --green: #1e7f64;
+      --gold: #d89a1d;
+      --blue: #64748b;
+      --danger: #bf5a36;
+      --shadow: 0 24px 60px rgba(91, 74, 56, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(200,117,65,0.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(30,127,100,0.08), transparent 24%),
+        linear-gradient(180deg, #fbf6ef 0%, var(--bg) 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+    .nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .nav a {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(34,48,68,0.08);
+    }
+    .nav a.active {
+      background: var(--accent);
+      color: white;
+      border-color: transparent;
+    }
+    .hero {
+      background: var(--panel);
+      border: 1px solid rgba(34, 48, 68, 0.06);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+    .hero-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 24px;
+    }
+    .eyebrow {
+      color: #4f6b8a;
+      font-size: 12px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(42px, 6vw, 78px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+    .subtitle {
+      color: var(--muted);
+      max-width: 960px;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(34,48,68,0.08);
+      color: #4d5d70;
+      font-size: 13px;
+    }
+    .hero-card {
+      border-radius: 28px;
+      background: linear-gradient(180deg, #2a3648 0%, #253142 100%);
+      color: #f9f4ec;
+      padding: 24px;
+      min-height: 100%;
+    }
+    .hero-card h2 {
+      margin: 8px 0 12px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .hero-card p {
+      margin: 0;
+      color: rgba(249,244,236,0.82);
+      line-height: 1.8;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(34,48,68,0.08);
+      border-radius: 22px;
+      padding: 16px;
+      min-height: 116px;
+    }
+    .stat .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .stat .value {
+      font-size: 36px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .stat .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .positive { color: var(--green); }
+    .negative { color: var(--danger); }
+    .shell {
+      margin-top: 22px;
+      display: grid;
+      gap: 22px;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+      gap: 22px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(34,48,68,0.06);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+    .panel-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .ghost-btn {
+      border: 1px solid rgba(34,48,68,0.12);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .signal-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.8);
+    }
+    .badge.attack { background: rgba(200,117,65,0.12); color: var(--accent-dark); }
+    .badge.defense { background: rgba(30,127,100,0.12); color: var(--green); }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .info-card, .diagnostic-card {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(34,48,68,0.08);
+      border-radius: 22px;
+      padding: 16px;
+    }
+    .info-card h4, .diagnostic-card h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+    .info-card p, .diagnostic-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(34,48,68,0.08);
+      font-size: 12px;
+      color: #556678;
+    }
+    .master-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+      gap: 18px;
+    }
+    .master-box {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(34,48,68,0.08);
+      border-radius: 24px;
+      padding: 18px;
+      min-height: 100%;
+    }
+    .master-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .master-head h4 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .master-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 8px 0 0;
+    }
+    .master-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .master-kpi {
+      border-radius: 18px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.78);
+      padding: 14px;
+    }
+    .master-kpi .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .master-kpi .value {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    .master-formula {
+      border-radius: 18px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(34,48,68,0.03);
+      padding: 14px 16px;
+      color: #415164;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .master-note-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .master-note {
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(34,48,68,0.08);
+      color: #556678;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .sleeve-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .sleeve-row {
+      display: grid;
+      grid-template-columns: 126px minmax(0, 1fr) 62px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      color: #536172;
+    }
+    .bar-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(34,48,68,0.08);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(200,117,65,0.9), rgba(216,154,29,0.92));
+    }
+    .master-table-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .meta-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(34,48,68,0.08);
+      color: #57687a;
+      font-size: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(34,48,68,0.08);
+    }
+    td {
+      padding: 16px 12px;
+      border-bottom: 1px solid rgba(34,48,68,0.06);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    .asset-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .calc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .calc-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .calc-input input {
+      width: 180px;
+      border: 1px solid rgba(34,48,68,0.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.86);
+      font: inherit;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .calc-metric {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(34,48,68,0.08);
+      border-radius: 22px;
+      padding: 16px;
+    }
+    .calc-metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .calc-metric .value {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .chart-shell {
+      border-radius: 24px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.55);
+      padding: 18px;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-line {
+      width: 22px;
+      height: 0;
+      border-top: 3px solid currentColor;
+      border-radius: 999px;
+    }
+    .legend-line.dashed {
+      border-top-style: dashed;
+    }
+    .detail-table-shell {
+      max-height: 560px;
+      overflow: auto;
+      border-radius: 22px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.55);
+    }
+    .source-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .source-pill {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(34,48,68,0.08);
+      border-radius: 16px;
+      padding: 10px 12px;
+      min-width: 160px;
+      font-size: 12px;
+    }
+    .strategy-summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .strategy-summary-card {
+      border-radius: 24px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.72);
+      padding: 18px;
+    }
+    .strategy-summary-card h4 {
+      margin: 8px 0 6px;
+      font-size: 18px;
+    }
+    .strategy-summary-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      min-height: 44px;
+    }
+    .summary-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .summary-metric {
+      border-radius: 18px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.84);
+      padding: 14px;
+    }
+    .summary-metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .summary-metric .value {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    .summary-metric .note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+    .strategy-flip {
+      perspective: 1600px;
+      margin-top: 16px;
+    }
+    .strategy-flip-inner {
+      position: relative;
+      min-height: 440px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+    .strategy-flip.is-flipped .strategy-flip-inner {
+      transform: rotateY(180deg);
+    }
+    .strategy-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 30px;
+    }
+    .strategy-card {
+      background: var(--panel);
+      border: 1px solid rgba(34,48,68,0.06);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .flip-back-shell {
+      transform: rotateY(180deg);
+      background: linear-gradient(180deg, #2a3648 0%, #253142 100%);
+      color: #f9f4ec;
+      border: 1px solid rgba(34,48,68,0.06);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .flip-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .flip-head h4 {
+      margin: 8px 0 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+    .flip-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .flip-copy {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+      margin: 0 0 16px;
+      max-width: 70ch;
+    }
+    .flip-back-copy {
+      color: rgba(249,244,236,0.82);
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+      max-width: 78ch;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      margin-top: 16px;
+    }
+    .quickstart-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .quickstart-box {
+      border-radius: 22px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.72);
+      padding: 18px;
+    }
+    .quickstart-box h4 {
+      margin: 8px 0 10px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .quickstart-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .quickstart-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .report-block {
+      border-radius: 22px;
+      border: 1px solid rgba(34,48,68,0.08);
+      background: rgba(255,255,255,0.72);
+      padding: 18px;
+    }
+    .flip-back-shell .report-block {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .report-block h5 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+    .report-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .report-item {
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(34,48,68,0.08);
+      color: #556678;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .flip-back-shell .report-item {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.08);
+      color: rgba(249,244,236,0.88);
+    }
+    .report-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .report-chip {
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(34,48,68,0.08);
+      color: #516274;
+    }
+    .flip-back-shell .report-chip {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.08);
+      color: rgba(249,244,236,0.88);
+    }
+    @media (max-width: 1100px) {
+      .hero-top, .two-col { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .calc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .master-grid { grid-template-columns: 1fr; }
+      .strategy-summary-strip, .summary-metrics, .report-grid, .quickstart-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .page { padding: 18px 14px 36px; }
+      h1 { font-size: 38px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .info-grid, .calc-grid { grid-template-columns: 1fr; }
+      .strategy-summary-strip, .summary-metrics, .report-grid, .quickstart-strip { grid-template-columns: 1fr; }
+      .calc-head { flex-direction: column; align-items: stretch; }
+      .calc-input input { width: 100%; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tbody tr {
+        border-bottom: 1px solid rgba(34,48,68,0.08);
+        padding: 10px 0;
+      }
+      td {
+        border-bottom: none;
+        padding: 8px 12px;
+      }
+      td::before {
+        content: attr(data-label);
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="nav">
+      <span>站内导航</span>
+      <a href="/fund-board">基金主台</a>
+      <a href="/fund-dual-momentum-board" class="active">双动量独立台</a>
+      <a href="/fund-yield-board">基金高收益台</a>
+      <a href="/fund-universe">全市场基金池</a>
+      <a href="/stock-board">股票主台</a>
+      <a href="/stock-yield-board">股票高收益台</a>
+      <a href="/sector-board">易总行业量化</a>
+      <a href="/us-stock-board">美股观察台</a>
+      <a href="/delivery-log">交付说明台</a>
+    </div>
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow">Dual Momentum Desk</div>
+          <h1 id="title">基金组合决策台-双动量轮动</h1>
+          <div class="subtitle" id="subtitle">只展示双动量轮动正式版模型的实时监控、信号判断、回测与调仓明细。</div>
+          <div class="pill-row">
+            <div class="pill" id="asOfPill">截至 --</div>
+            <div class="pill" id="sourcePill">数据源 --</div>
+            <div class="pill" id="coveragePill">覆盖率 --</div>
+            <div class="pill" id="rebalancePill">调仓频率 --</div>
+            <div class="pill" id="cachePill">缓存状态 --</div>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="eyebrow" style="color:rgba(249,244,236,0.72);">当前执行信号</div>
+          <h2 id="signalMode">--</h2>
+          <p id="signalReason">--</p>
+          <div class="pill-row" style="margin-top:18px;">
+            <span class="badge attack" id="selectedAssetsBadge">选中资产 --</span>
+            <span class="badge defense" id="rebalanceDateBadge">调仓日 --</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-grid" id="heroStats"></div>
+    </section>
+
+    <div class="shell">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">一眼看懂这页怎么用</h3>
+            <p class="panel-copy">双动量独立台适合快速展示“当前有没有进攻信号、现在持有什么、历史大致跑成什么样”。给朋友看时，先看这里最直观。</p>
+          </div>
+        </div>
+        <div class="quickstart-strip">
+          <div class="quickstart-box">
+            <div class="eyebrow">这页干什么</div>
+            <h4 id="quickIntroTitle">--</h4>
+            <p id="quickIntroCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="eyebrow">先看哪里</div>
+            <div id="quickLookList"></div>
+          </div>
+          <div class="quickstart-box">
+            <div class="eyebrow">当前该怎么做</div>
+            <h4 id="quickDecisionTitle">--</h4>
+            <p id="quickDecisionCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="eyebrow">历史效果速览</div>
+            <h4 id="quickPerformanceTitle">--</h4>
+            <p id="quickPerformanceCopy">--</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">策略智能总控</h3>
+            <p class="panel-copy">把双动量当前的市场阶段、真实覆盖度、因子主线和样本外稳定性压成首屏摘要，先回答“这套策略现在值不值得信”。</p>
+          </div>
+        </div>
+        <div class="stat-grid" id="intelligenceStats"></div>
+        <div class="report-grid" style="margin-top:18px;">
+          <div class="report-block">
+            <h5>市场阶段</h5>
+            <div class="report-list">
+              <div class="report-item" id="regimeSummary">--</div>
+            </div>
+          </div>
+          <div class="report-block">
+            <h5>数据覆盖</h5>
+            <div class="report-list">
+              <div class="report-item" id="coverageSummary">--</div>
+            </div>
+          </div>
+          <div class="report-block">
+            <h5>因子主线</h5>
+            <div class="report-list">
+              <div class="report-item" id="factorSummary">--</div>
+            </div>
+          </div>
+          <div class="report-block">
+            <h5>样本外体检</h5>
+            <div class="report-list">
+              <div class="report-item" id="validationSummary">--</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">报告式说明卡</h3>
+            <p class="panel-copy">把双动量轮动的定位、成效、执行信号和专业口径压缩成一张可翻页说明卡。刷新后会自动跟随最新快照，方便给懂策略和不懂策略的人分别看。</p>
+          </div>
+        </div>
+        <div class="strategy-summary-strip" id="strategySummaryStrip"></div>
+        <div class="strategy-flip" id="reportFlipCard">
+          <div class="strategy-flip-inner" id="reportFlipInner"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">主模型同步视图</h3>
+            <p class="panel-copy">双动量独立板专注展示单策略执行结果，但这里同步主模型当前市场状态和正式配仓，方便判断双动量在整个基金主模型中的位置。</p>
+          </div>
+        </div>
+        <div class="master-grid">
+          <div class="master-box">
+            <div class="master-head">
+              <div>
+                <h4 id="masterModelName">--</h4>
+                <div class="master-copy" id="masterModelRegime">--</div>
+              </div>
+              <span class="badge" id="masterModelVersion">--</span>
+            </div>
+            <div class="master-copy" id="masterModelObjective">--</div>
+            <div class="master-kpis" id="masterModelKpis"></div>
+            <div class="master-formula" id="masterModelFormula">--</div>
+            <div class="master-note-list" id="masterModelNotes"></div>
+          </div>
+          <div class="master-box">
+            <div class="master-head">
+              <div>
+                <h4>主模型正式配仓</h4>
+                <div class="master-copy">这里展示当前主模型的仓位层目标和推荐持仓，帮助理解双动量在母模型配置里的权重位置。</div>
+              </div>
+            </div>
+            <div class="sleeve-grid" id="masterModelSleeves"></div>
+            <div class="master-table-meta" id="masterModelMeta"></div>
+            <div class="detail-table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>基金</th>
+                    <th>仓位层</th>
+                    <th>目标仓位</th>
+                    <th>当前种子仓位</th>
+                    <th>主模型分数</th>
+                  </tr>
+                </thead>
+                <tbody id="masterModelTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">模型定义与执行口径</h3>
+            <p class="panel-copy">这里把双动量轮动正式版的固定池、阈值、进攻结构、防守结构一次讲清楚，避免策略展示和实际回测口径不一致。</p>
+          </div>
+          <button class="ghost-btn" id="forceRefreshBtn" type="button">手动刷新最新数据</button>
+        </div>
+        <div class="two-col">
+          <div class="info-grid">
+            <div class="info-card">
+              <h4>策略来源</h4>
+              <p id="strategySource">--</p>
+            </div>
+            <div class="info-card">
+              <h4>适用场景</h4>
+              <p id="strategyFit">--</p>
+            </div>
+            <div class="info-card">
+              <h4>指标口径</h4>
+              <div class="chip-list" id="indicatorChips"></div>
+            </div>
+            <div class="info-card">
+              <h4>核心阈值</h4>
+              <div class="chip-list" id="thresholdChips"></div>
+            </div>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <h4>进攻结构</h4>
+              <div class="chip-list" id="attackChips"></div>
+            </div>
+            <div class="info-card">
+              <h4>防守结构</h4>
+              <div class="chip-list" id="defenseChips"></div>
+            </div>
+            <div class="info-card" style="grid-column: 1 / -1;">
+              <h4>策略逻辑</h4>
+              <div class="chip-list" id="logicChips"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">固定策略池与实时信号监控</h3>
+              <p class="panel-copy">固定池只看这 6 个标的：风险资产、固收、黄金、现金。这里会同时展示实时价格、涨跌、动量因子、趋势过滤和最终是否入选。</p>
+            </div>
+          </div>
+          <div class="detail-table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>标的</th>
+                  <th>角色</th>
+                  <th>最新价 / 涨跌</th>
+                  <th>20 / 60 / 120日</th>
+                  <th>20日波动 / 分数</th>
+                  <th>趋势过滤</th>
+                  <th>当前动作</th>
+                </tr>
+              </thead>
+              <tbody id="watchRowsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">独立金额测算</h3>
+              <p class="panel-copy">把当前模型目标仓位直接换算成目标金额、参考现持、调整金额，适合拿来做策略执行和复盘。</p>
+            </div>
+          </div>
+          <div class="calc-head">
+            <label class="calc-input">
+              <span>本策略金额</span>
+              <input id="capitalInput" type="number" min="0" step="1000" value="100000" />
+            </label>
+            <div class="signal-badges">
+              <span class="badge" id="selectedAssetsPill">当前选中 --</span>
+              <span class="badge" id="modePill">模式 --</span>
+            </div>
+          </div>
+          <div class="calc-grid" id="calcSummary"></div>
+          <div class="detail-table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>基金</th>
+                  <th>目标仓位</th>
+                  <th>目标金额</th>
+                  <th>参考现持</th>
+                  <th>调整金额</th>
+                  <th>动作</th>
+                </tr>
+              </thead>
+              <tbody id="positionTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">组合表现对比</h3>
+            <p class="panel-copy">这里单独对比“双动量轮动”和“本地缓存等权基准”，方便看出模型是否真的比简单持有更有纪律。</p>
+          </div>
+        </div>
+        <div class="chart-shell">
+          <div class="chart-legend" id="legend"></div>
+          <svg id="perfChart" viewBox="0 0 760 300" width="100%" height="300" preserveAspectRatio="none"></svg>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">调仓过程</h3>
+              <p class="panel-copy">每次调仓都会留下当日持仓变化和诊断结果，方便看清模型何时进攻、何时防守、何时只是热身期。</p>
+            </div>
+          </div>
+          <div class="detail-table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>调仓日</th>
+                  <th>模式</th>
+                  <th>当日原因</th>
+                  <th>持仓变化</th>
+                </tr>
+              </thead>
+              <tbody id="rebalanceBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">最近 60 个交易日收益来源</h3>
+              <p class="panel-copy">这里会展示每日组合收益、累计收益，以及当天收益分别来自哪些基金，便于你从结果直接追溯来源。</p>
+            </div>
+          </div>
+          <div class="detail-table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>当日收益</th>
+                  <th>累计收益</th>
+                  <th>收益来源</th>
+                </tr>
+              </thead>
+              <tbody id="traceBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+  <script>
+    const refreshMs = 30000;
+    let data = null;
+    let capital = 100000;
+    let refreshTimer = null;
+    let countdownTimer = null;
+    let refreshDeadline = null;
+    let refreshErrorActive = false;
+
+    function formatMoney(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+      return `¥${Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    function formatSigned(value, digits = 1) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+      const num = Number(value);
+      return `${num > 0 ? "+" : ""}${num.toFixed(digits)}%`;
+    }
+    function formatPct(value, digits = 2) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+      return `${Number(value).toFixed(digits)}%`;
+    }
+    function formatPrice(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+      return Number(value).toFixed(3);
+    }
+    function toneClass(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "";
+      const num = Number(value);
+      return num > 0 ? "positive" : num < 0 ? "negative" : "";
+    }
+    function cacheText(cache) {
+      if (!cache) return "--";
+      const age = cache.age_seconds ?? 0;
+      const ttl = cache.ttl_seconds ?? 0;
+      const modeMap = {
+        fresh: "刚刷新",
+        cached: "缓存复用",
+        stale_snapshot: "快照兜底",
+        refreshing_snapshot: "后台刷新中",
+        refresh_in_progress: "后台刷新中",
+        refresh_failed_snapshot: "刷新失败已兜底",
+      };
+      const mode = modeMap[cache.mode] || cache.mode || "--";
+      return `${mode} · ${age}s / ${ttl}s`;
+    }
+    function setCacheStatus(text, isError = false) {
+      const node = document.getElementById("cachePill");
+      if (!node) return;
+      node.textContent = text;
+      node.classList.toggle("error", isError);
+      refreshErrorActive = isError;
+    }
+    function updateCountdown() {
+      if (!refreshDeadline || refreshErrorActive) return;
+      const remain = Math.max(0, Math.ceil((refreshDeadline - Date.now()) / 1000));
+      const cache = data?._cache;
+      const prefix = cache ? `${cacheText(cache)} · ` : "";
+      setCacheStatus(`${prefix}下次自动刷新 ${remain}s`, false);
+    }
+    function lineStyle(name) {
+      if (name === "本地缓存等权基准") return { color: "#5E6472", dash: "8 6", cls: "dashed" };
+      return { color: "#D89A1D", dash: "", cls: "" };
+    }
+    function sleeveLabel(value) {
+      const mapping = {
+        active_equity: "主动权益层",
+        beta_etf: "ETF层",
+        defense_fixed_income: "固收防守层",
+        global_commodity: "全球/商品层",
+        cash_buffer: "现金缓冲层",
+      };
+      return mapping[value] || value || "--";
+    }
+    function formatWeight(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+      return `${Number(value).toFixed(2)}%`;
+    }
+    function masterRegimeLabel(model) {
+      if (!model || !model.regime) return "--";
+      if (typeof model.regime === "string") return model.regime;
+      return model.regime.label || "--";
+    }
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+    function reportSignalTone(mode) {
+      if (!mode) return "";
+      return String(mode).includes("attack") ? "attack" : "defense";
+    }
+    function findTopRiskRow() {
+      const rows = data.signal_board?.score_rows || [];
+      return rows.find((row) => row.role === "风险资产" && row.selected) || rows.find((row) => row.role === "风险资产") || null;
+    }
+
+    function renderReportCard() {
+      const topRisk = findTopRiskRow();
+      const signalTone = reportSignalTone(data.signal_board?.mode);
+      const thresholds = (data.model_spec?.thresholds || []).slice(0, 4);
+      const factors = (data.model_spec?.indicator_chips || []).slice(0, 6);
+      const logic = (data.model_spec?.logic || []).slice(0, 5);
+      const selectedNames = data.signal_board?.selected_names?.join(" / ") || "--";
+      const positions = (data.positions || []).map((item) => `${item.name} ${formatWeight(item.target_weight)}`);
+      const summaryCards = [
+        {
+          title: "策略定位",
+          copy: data.hero?.fit || "适合愿意跟随信号换仓的账户",
+          valueLabel: "当前状态",
+          value: data.hero?.status || "--",
+          note: data.hero?.source || "--",
+        },
+        {
+          title: "收益表现",
+          copy: data.hero?.summary || "--",
+          valueLabel: "自起始日收益",
+          value: formatSigned(data.hero?.since_start),
+          note: `今年以来 ${formatSigned(data.hero?.ytd_return)} / 最大回撤 ${formatSigned(data.hero?.max_drawdown)}`,
+        },
+        {
+          title: "当前信号",
+          copy: data.signal_board?.reason || data.hero?.latest_signal || "--",
+          valueLabel: "信号模式",
+          value: data.signal_board?.mode_label || "--",
+          note: `当前选中 ${selectedNames}`,
+        },
+        {
+          title: "执行纪律",
+          copy: `固定池 ${data.model_spec?.fixed_pool?.length || 0} 个标的，周频调仓，强刷后自动回写最新快照。`,
+          valueLabel: "最近调仓",
+          value: data.signal_board?.rebalance_date || "--",
+          note: topRisk ? `最强风险资产 ${topRisk.name} / score ${topRisk.raw_score ?? "--"}` : "等待最新信号",
+        },
+      ];
+      document.getElementById("strategySummaryStrip").innerHTML = summaryCards.map((item) => `
+        <div class="strategy-summary-card">
+          <div class="section-label">${item.title}</div>
+          <h4>${item.value}</h4>
+          <div class="strategy-summary-copy">${escapeHtml(item.copy)}</div>
+          <div class="summary-metrics">
+            <div class="summary-metric">
+              <div class="label">${item.valueLabel}</div>
+              <div class="value ${toneClass(item.value)}">${item.value}</div>
+              <div class="note">${escapeHtml(item.note)}</div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("reportFlipInner").innerHTML = `
+        <div class="strategy-card strategy-face front">
+          <div class="flip-head">
+            <div>
+              <div class="section-label">Dual Momentum Report</div>
+              <h4>${data.hero?.plan_name || "双动量轮动"}</h4>
+            </div>
+            <div class="flip-actions">
+              <span class="badge ${signalTone}">${data.signal_board?.mode_label || "--"}</span>
+              <button class="ghost-btn" type="button" data-flip-toggle="report">查看专业说明</button>
+            </div>
+          </div>
+          <p class="flip-copy">${escapeHtml(data.hero?.summary || "--")}</p>
+          <div class="summary-metrics">
+            <div class="summary-metric">
+              <div class="label">当前策略收益</div>
+              <div class="value">${formatSigned(data.hero?.since_start)}</div>
+              <div class="note">自 ${data.hero?.since_start_date || "--"} 起</div>
+            </div>
+            <div class="summary-metric">
+              <div class="label">今年以来</div>
+              <div class="value">${formatSigned(data.hero?.ytd_return)}</div>
+              <div class="note">自 ${data.hero?.ytd_start_date || "--"} 起</div>
+            </div>
+            <div class="summary-metric">
+              <div class="label">最大回撤</div>
+              <div class="value">${formatSigned(data.hero?.max_drawdown)}</div>
+              <div class="note">真实本地缓存回测</div>
+            </div>
+            <div class="summary-metric">
+              <div class="label">当前状态</div>
+              <div class="value">${data.hero?.status || "--"}</div>
+              <div class="note">${escapeHtml(data.hero?.fit || "--")}</div>
+            </div>
+          </div>
+          <div class="report-grid">
+            <div class="report-block">
+              <h5>当前执行快照</h5>
+              <div class="report-list">
+                <div class="report-item">当前模式：${data.signal_board?.mode_label || "--"}</div>
+                <div class="report-item">最近调仓日：${data.signal_board?.rebalance_date || "--"}</div>
+                <div class="report-item">当前选中：${selectedNames}</div>
+                <div class="report-item">当前目标持仓：${positions.join(" / ") || "--"}</div>
+              </div>
+            </div>
+            <div class="report-block">
+              <h5>最强风险资产</h5>
+              <div class="report-list">
+                <div class="report-item">标的：${topRisk?.name || "--"} ${topRisk?.code ? `(${topRisk.code})` : ""}</div>
+                <div class="report-item">20/60/120 日动量：${formatSigned(topRisk?.mom20, 2)} / ${formatSigned(topRisk?.mom60, 2)} / ${formatSigned(topRisk?.mom120, 2)}</div>
+                <div class="report-item">raw score：${topRisk?.raw_score ?? "--"} / adjusted：${topRisk?.adjusted_score ?? "--"}</div>
+                <div class="report-item">趋势过滤：${topRisk?.trend_ok === undefined ? "--" : (topRisk.trend_ok ? "通过" : "未通过")}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-back-shell strategy-face back">
+          <div class="flip-head">
+            <div>
+              <div class="section-label">Professional Spec</div>
+              <h4>专业说明卡</h4>
+            </div>
+            <div class="flip-actions">
+              <span class="badge ${signalTone}">${data.hero?.status || "--"}</span>
+              <button class="ghost-btn" type="button" data-flip-toggle="report">返回概览</button>
+            </div>
+          </div>
+          <div class="flip-back-copy">这张背面卡片用来快速回答“这个算法到底看什么、怎么进攻、什么时候防守、当前为什么这么配”。给懂量化的人看，它已经是接近 one-pager 的表达方式。</div>
+          <div class="report-grid">
+            <div class="report-block">
+              <h5>当前因子</h5>
+              <div class="report-chip-list">${factors.map((item) => `<span class="report-chip">${escapeHtml(item)}</span>`).join("")}</div>
+            </div>
+            <div class="report-block">
+              <h5>核心阈值</h5>
+              <div class="report-chip-list">${thresholds.map((item) => `<span class="report-chip">${escapeHtml(item)}</span>`).join("")}</div>
+            </div>
+            <div class="report-block">
+              <h5>策略逻辑</h5>
+              <div class="report-list">${logic.map((item) => `<div class="report-item">${escapeHtml(item)}</div>`).join("")}</div>
+            </div>
+            <div class="report-block">
+              <h5>当前结论</h5>
+              <div class="report-list">
+                <div class="report-item">当前信号：${data.signal_board?.mode_label || "--"}</div>
+                <div class="report-item">结论原因：${escapeHtml(data.signal_board?.reason || "--")}</div>
+                <div class="report-item">进攻结构：${escapeHtml((data.model_spec?.attack_structure || []).join("；"))}</div>
+                <div class="report-item">防守结构：${escapeHtml((data.model_spec?.defense_structure || []).join("；"))}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.querySelectorAll('[data-flip-toggle="report"]').forEach((button) => {
+        button.addEventListener("click", () => {
+          document.getElementById("reportFlipCard").classList.toggle("is-flipped");
+        });
+      });
+    }
+
+    function renderMasterModel() {
+      const model = data.master_model || {};
+      if (!model.name) {
+        document.getElementById("masterModelName").textContent = "主模型结果暂未同步";
+        document.getElementById("masterModelRegime").textContent = "--";
+        document.getElementById("masterModelVersion").textContent = "--";
+        document.getElementById("masterModelObjective").textContent = "当前独立板仍可正常查看双动量结果，主模型同步结果将在下一次成功快照后显示。";
+        document.getElementById("masterModelKpis").innerHTML = "";
+        document.getElementById("masterModelFormula").textContent = "--";
+        document.getElementById("masterModelNotes").innerHTML = "";
+        document.getElementById("masterModelSleeves").innerHTML = "";
+        document.getElementById("masterModelMeta").innerHTML = "";
+        document.getElementById("masterModelTableBody").innerHTML = "";
+        return;
+      }
+
+      const allocation = model.allocation || {};
+      const summary = allocation.summary || {};
+      const coverage = model.coverage || {};
+      const constraints = allocation.constraints || {};
+      const notes = constraints.notes || [];
+      const regimeTargets = allocation.regime_targets || {};
+      const positions = allocation.positions || [];
+
+      document.getElementById("masterModelName").textContent = model.name || "--";
+      document.getElementById("masterModelRegime").textContent = `当前市场状态：${masterRegimeLabel(model)}${model.regime?.reason ? ` · ${model.regime.reason}` : ""}`;
+      document.getElementById("masterModelVersion").textContent = model.version || "--";
+      document.getElementById("masterModelObjective").textContent = model.objective || "--";
+      document.getElementById("masterModelKpis").innerHTML = [
+        ["可评分覆盖", `${coverage.scored ?? "--"} / ${coverage.requested ?? "--"}`],
+        ["覆盖率", formatPct((coverage.ratio ?? 0) * 100, 2)],
+        ["预计换手", formatPct(summary.estimated_turnover, 2)],
+        ["防守底仓", formatPct(summary.defense_floor, 1)],
+      ].map(([label, value]) => `
+        <div class="master-kpi">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </div>
+      `).join("");
+      document.getElementById("masterModelFormula").textContent = model.score_formula || "--";
+      document.getElementById("masterModelNotes").innerHTML = notes.map((note) => `<div class="master-note">${note}</div>`).join("");
+      document.getElementById("masterModelSleeves").innerHTML = Object.entries(regimeTargets).map(([key, value]) => `
+        <div class="sleeve-row">
+          <span>${sleeveLabel(key)}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(0, Math.min(Number(value) || 0, 100))}%"></div></div>
+          <strong>${formatPct(value, 1)}</strong>
+        </div>
+      `).join("");
+      document.getElementById("masterModelMeta").innerHTML = [
+        `总权重 ${formatPct(summary.total_weight, 2)}`,
+        `现金回流 ${formatPct(summary.carry_over_cash_like, 2)}`,
+        `持仓数 ${positions.length}`,
+      ].map((item) => `<span class="meta-pill">${item}</span>`).join("");
+      document.getElementById("masterModelTableBody").innerHTML = positions.map((row) => `
+        <tr>
+          <td data-label="基金">
+            <div class="asset-name">${row.name || row.code}</div>
+            <div class="muted">${row.code} · ${row.style || row.category || "--"}</div>
+          </td>
+          <td data-label="仓位层">${sleeveLabel(row.sleeve)}</td>
+          <td data-label="目标仓位">${formatWeight(row.target_weight)}</td>
+          <td data-label="当前种子仓位">${formatWeight(row.current_weight_seed)}</td>
+          <td data-label="主模型分数">${row.master_score === null || row.master_score === undefined ? "--" : Number(row.master_score).toFixed(4)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderHero() {
+      document.getElementById("title").textContent = data.meta.title;
+      document.getElementById("subtitle").textContent = data.meta.subtitle;
+      document.getElementById("asOfPill").textContent = `截至 ${data.meta.as_of || "--"}`;
+      document.getElementById("sourcePill").textContent = `数据源 ${data.meta.data_source || "--"}`;
+      document.getElementById("coveragePill").textContent = `覆盖率 ${data.meta.coverage_text || "--"}`;
+      document.getElementById("rebalancePill").textContent = `调仓频率 ${data.meta.rebalance_rule || "--"}`;
+      document.getElementById("cachePill").textContent = cacheText(data._cache);
+      document.getElementById("signalMode").textContent = data.signal_board.mode_label || "--";
+      document.getElementById("signalReason").textContent = data.signal_board.reason || data.hero.latest_signal || "--";
+      document.getElementById("selectedAssetsBadge").textContent = `选中资产 ${data.signal_board.selected_names?.join(" / ") || "--"}`;
+      document.getElementById("rebalanceDateBadge").textContent = `最近调仓 ${data.signal_board.rebalance_date || "--"}`;
+      document.getElementById("strategySource").textContent = data.hero.source || "--";
+      document.getElementById("strategyFit").textContent = data.hero.fit || "--";
+      document.getElementById("indicatorChips").innerHTML = (data.model_spec.indicator_chips || []).map((item) => `<span class="chip">${item}</span>`).join("");
+      document.getElementById("thresholdChips").innerHTML = (data.model_spec.thresholds || []).map((item) => `<span class="chip">${item}</span>`).join("");
+      document.getElementById("attackChips").innerHTML = (data.model_spec.attack_structure || []).map((item) => `<span class="chip">${item}</span>`).join("");
+      document.getElementById("defenseChips").innerHTML = (data.model_spec.defense_structure || []).map((item) => `<span class="chip">${item}</span>`).join("");
+      document.getElementById("logicChips").innerHTML = (data.model_spec.logic || []).map((item) => `<span class="chip">${item}</span>`).join("");
+      document.getElementById("selectedAssetsPill").textContent = `当前选中 ${data.signal_board.selected_names?.join(" / ") || "--"}`;
+      document.getElementById("modePill").textContent = `模式 ${data.signal_board.mode_label || "--"}`;
+
+      const stats = [
+        ["自起始日收益", formatSigned(data.hero.since_start), `自 ${data.hero.since_start_date || "--"} 起`],
+        ["今年以来", formatSigned(data.hero.ytd_return), `自 ${data.hero.ytd_start_date || "--"} 起`],
+        ["最大回撤", formatSigned(data.hero.max_drawdown), "真实本地缓存回测"],
+        ["当前状态", data.hero.status || "--", data.meta.backtest_source || "--"],
+        ["信号模式", data.signal_board.mode_label || "--", data.signal_board.reason || "--"],
+        ["固定池规模", `${data.model_spec.fixed_pool?.length || 0} 个标的`, "风险资产 + 固收 + 黄金 + 现金"],
+      ];
+      document.getElementById("heroStats").innerHTML = stats.map(([label, value, note]) => `
+        <div class="stat">
+          <div class="label">${label}</div>
+          <div class="value ${toneClass(value)}">${value}</div>
+          <div class="note">${note}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderQuickGuide() {
+      const intelligence = data.strategy_intelligence || {};
+      const selectedNames = data.signal_board.selected_names?.join(" / ") || "--";
+      const topRisk = (data.watch_rows || []).find((row) => row.selected && row.role === "风险进攻") || (data.watch_rows || []).find((row) => row.selected) || {};
+      const lookList = [
+        "先看当前该怎么做，确认今天是进攻还是防守。",
+        "再看“报告式说明卡”，快速讲清双动量因子、阈值和逻辑。",
+        "最后看“当前目标持仓”和“调仓记录”，确认怎么落到仓位上。",
+      ];
+      document.getElementById("quickIntroTitle").textContent = "双动量正式执行页";
+      document.getElementById("quickIntroCopy").textContent = "这里不混其他基金策略，只专注展示双动量轮动自己的信号、持仓、回测和调仓痕迹，适合快速判断这套模型现在有没有可执行价值。";
+      document.getElementById("quickLookList").innerHTML = `<ol class="quickstart-list">${lookList.map((item) => `<li>${item}</li>`).join("")}</ol>`;
+      document.getElementById("quickDecisionTitle").textContent = data.signal_board.mode_label || "--";
+      document.getElementById("quickDecisionCopy").textContent = `${data.signal_board.reason || "--"}。当前选中 ${selectedNames}。${topRisk.name ? `最强风险资产是 ${topRisk.name}${topRisk.code ? ` (${topRisk.code})` : ""}。` : ""}`;
+      document.getElementById("quickPerformanceTitle").textContent = formatSigned(data.hero.since_start);
+      document.getElementById("quickPerformanceCopy").textContent = `今年以来 ${formatSigned(data.hero.ytd_return)} / 最大回撤 ${formatSigned(data.hero.max_drawdown)}。样本外体检：${intelligence.validation?.summary || "--"}`;
+    }
+
+    function renderIntelligence() {
+      const intelligence = data.strategy_intelligence || {};
+      const coverage = intelligence.coverage || {};
+      const factor = intelligence.factor_insights || {};
+      const validation = intelligence.validation || {};
+      const regime = intelligence.market_regime || {};
+      const stats = [
+        ["市场阶段", regime.label || data.hero.market_regime || "--", regime.action || "--"],
+        ["历史底表", `${coverage.cached_history ?? "--"} 只`, "本地已缓存、后续可直接训练"],
+        ["进入测算", `${coverage.measured_count ?? "--"} / ${coverage.total_universe ?? "--"}`, "当前真实进入测算 / 全市场"],
+        ["样本外正收益窗", `${validation.positive_ratio_pct ?? "--"}%`, validation.window_count ? `共 ${validation.window_count} 个窗口` : "--"],
+      ];
+      document.getElementById("intelligenceStats").innerHTML = stats.map(([label, value, note]) => `
+        <div class="stat">
+          <div class="label">${label}</div>
+          <div class="value ${toneClass(value)}">${value}</div>
+          <div class="note">${note}</div>
+        </div>
+      `).join("");
+      document.getElementById("regimeSummary").textContent = regime.summary || data.hero.regime_summary || "--";
+      document.getElementById("coverageSummary").textContent = coverage.summary || "--";
+      document.getElementById("factorSummary").textContent = `${factor.headline || "--"} ${factor.summary || ""}`.trim();
+      document.getElementById("validationSummary").textContent = validation.summary || "--";
+    }
+
+    function renderWatchRows() {
+      document.getElementById("watchRowsBody").innerHTML = (data.watch_rows || []).map((row) => `
+        <tr>
+          <td data-label="标的">
+            <div class="asset-name">${row.name}</div>
+            <div class="muted">${row.code} · ${row.kind || row.category || "--"}</div>
+          </td>
+          <td data-label="角色">
+            <div>${row.role || "--"}</div>
+            <div class="muted">${row.selected ? "本期入选" : "未入选 / 防守观察"}</div>
+          </td>
+          <td data-label="最新价 / 涨跌">
+            <div>${formatPrice(row.last_price)}</div>
+            <div class="muted ${toneClass(row.change_pct)}">${formatSigned(row.change_pct, 2)} · ${row.realtime_tag || "--"}</div>
+          </td>
+          <td data-label="20/60/120日">
+            <div>${formatSigned(row.momentum_20d, 2)} / ${formatSigned(row.momentum_60d, 2)} / ${formatSigned(row.momentum_120d, 2)}</div>
+          </td>
+          <td data-label="20日波动 / 分数">
+            <div>${formatPct(row.volatility_20d, 2)} / ${row.adjusted_score ?? "--"}</div>
+            <div class="muted">原始分 ${row.raw_score ?? "--"}</div>
+          </td>
+          <td data-label="趋势过滤">
+            <span class="badge ${row.trend_ok ? "attack" : "defense"}">${row.trend_ok === undefined ? "--" : (row.trend_ok ? "通过" : "未通过")}</span>
+          </td>
+          <td data-label="当前动作">
+            <div>${row.trade_action || "--"}</div>
+            <div class="muted">目标 ${row.target_weight ?? 0}% · 现持 ${row.current_weight ?? 0}%</div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderPositionSizing() {
+      const rows = data.positions || [];
+      let totalTarget = 0;
+      let totalCurrent = 0;
+      let totalAdjust = 0;
+      const body = rows.map((row) => {
+        const targetAmount = capital * Number(row.target_weight || 0) / 100;
+        const currentAmount = capital * Number(row.current_weight || 0) / 100;
+        const adjustAmount = targetAmount - currentAmount;
+        totalTarget += targetAmount;
+        totalCurrent += currentAmount;
+        totalAdjust += adjustAmount;
+        return `
+          <tr>
+            <td data-label="基金">
+              <div class="asset-name">${row.name || row.code}</div>
+              <div class="muted">${row.code} · ${row.kind || "--"} · ${row.signal_reason || ""}</div>
+            </td>
+            <td data-label="目标仓位">${row.target_weight}%</td>
+            <td data-label="目标金额">${formatMoney(targetAmount)}</td>
+            <td data-label="参考现持">${formatMoney(currentAmount)}</td>
+            <td data-label="调整金额" class="${toneClass(adjustAmount)}">${adjustAmount === 0 ? formatMoney(0) : `${adjustAmount > 0 ? "+" : "-"}${formatMoney(Math.abs(adjustAmount))}`}</td>
+            <td data-label="动作"><span class="badge ${adjustAmount > 0 ? "attack" : adjustAmount < 0 ? "defense" : ""}">${row.trade_action || "--"}</span></td>
+          </tr>
+        `;
+      }).join("");
+      const remain = capital - totalTarget;
+      document.getElementById("positionTableBody").innerHTML = body;
+      document.getElementById("calcSummary").innerHTML = `
+        <div class="calc-metric"><div class="label">目标总投入</div><div class="value">${formatMoney(totalTarget)}</div></div>
+        <div class="calc-metric"><div class="label">参考现持</div><div class="value">${formatMoney(totalCurrent)}</div></div>
+        <div class="calc-metric"><div class="label">需调整金额</div><div class="value ${toneClass(totalAdjust)}">${totalAdjust === 0 ? formatMoney(0) : `${totalAdjust > 0 ? "+" : "-"}${formatMoney(Math.abs(totalAdjust))}`}</div></div>
+        <div class="calc-metric"><div class="label">剩余现金缓冲</div><div class="value">${formatMoney(remain)}</div></div>
+      `;
+    }
+
+    function buildPolyline(values, min, max, width, height, pad) {
+      const innerWidth = width - pad * 2;
+      const innerHeight = height - pad * 2;
+      return values.map((value, index) => {
+        const x = pad + (innerWidth * index) / Math.max(values.length - 1, 1);
+        const ratio = (value - min) / Math.max(max - min, 1);
+        const y = height - pad - ratio * innerHeight;
+        return `${x},${y}`;
+      }).join(" ");
+    }
+
+    function renderChart() {
+      const series = data.performance?.series || [];
+      const labels = data.performance?.labels || [];
+      const chart = document.getElementById("perfChart");
+      const values = series.flatMap((item) => item.values || []);
+      const min = Math.min(...values, 0);
+      const max = Math.max(...values, 1);
+      const width = 760;
+      const height = 300;
+      const pad = 28;
+      document.getElementById("legend").innerHTML = series.map((item) => {
+        const style = lineStyle(item.name);
+        return `<span class="legend-item" style="color:${style.color}"><span class="legend-line ${style.cls}"></span>${item.name}</span>`;
+      }).join("");
+      const grid = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+        const y = height - pad - ratio * (height - pad * 2);
+        return `<line x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}" stroke="rgba(34,48,68,0.08)" stroke-width="1" />`;
+      }).join("");
+      const xLabels = labels.map((label, index) => {
+        const x = pad + ((width - pad * 2) * index) / Math.max(labels.length - 1, 1);
+        return `<text x="${x}" y="${height - 6}" text-anchor="middle" font-size="11" fill="#607080">${label}</text>`;
+      }).join("");
+      const yLabels = [min, (min + max) / 2, max].map((value, index) => {
+        const ratio = index / 2;
+        const y = height - pad - ratio * (height - pad * 2);
+        return `<text x="6" y="${y + 4}" font-size="11" fill="#607080">${value.toFixed(1)}%</text>`;
+      }).join("");
+      const lines = series.map((item) => {
+        const style = lineStyle(item.name);
+        const points = buildPolyline(item.values || [], min, max, width, height, pad);
+        return `<polyline fill="none" stroke="${style.color}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" ${style.dash ? `stroke-dasharray="${style.dash}"` : ""} points="${points}" />`;
+      }).join("");
+      chart.innerHTML = `${grid}${xLabels}${yLabels}${lines}`;
+    }
+
+    function renderRebalanceLog() {
+      document.getElementById("rebalanceBody").innerHTML = (data.rebalance_log || []).map((entry) => `
+        <tr>
+          <td data-label="调仓日">${entry.date}</td>
+          <td data-label="模式"><span class="badge ${(entry.diagnostic?.mode || "").includes("attack") ? "attack" : "defense"}">${entry.diagnostic?.mode || "--"}</span></td>
+          <td data-label="当日原因">${entry.diagnostic?.reason || "--"}</td>
+          <td data-label="持仓变化">
+            <div class="source-stack">
+              ${(entry.holdings || []).map((holding) => `
+                <div class="source-pill">
+                  <strong>${holding.name} (${holding.code})</strong>
+                  <span>目标仓位 ${formatPct(holding.weight_pct, 1)}</span>
+                  <span>较上次变化 ${formatSigned(holding.delta_pct, 1)}</span>
+                </div>
+              `).join("")}
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderDailyTrace() {
+      document.getElementById("traceBody").innerHTML = (data.recent_daily_trace || []).map((entry) => `
+        <tr>
+          <td data-label="日期">
+            <div>${entry.date}</div>
+            <div class="muted">${entry.is_rebalance ? "调仓日" : ""}</div>
+          </td>
+          <td data-label="当日收益" class="${toneClass(entry.portfolio_return_pct)}">${formatSigned(entry.portfolio_return_pct, 3)}</td>
+          <td data-label="累计收益" class="${toneClass(entry.cumulative_return_pct)}">${formatSigned(entry.cumulative_return_pct, 2)}</td>
+          <td data-label="收益来源">
+            <div class="source-stack">
+              ${(entry.sources || []).map((source) => `
+                <div class="source-pill">
+                  <strong>${source.name} (${source.code})</strong>
+                  <span>持仓 ${formatPct(source.weight_pct, 1)}</span>
+                  <span>日涨跌 ${formatSigned(source.daily_return_pct, 3)}</span>
+                  <span>贡献 ${formatSigned(source.contribution_pct, 3)}</span>
+                </div>
+              `).join("")}
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderAll() {
+      renderHero();
+      renderQuickGuide();
+      renderIntelligence();
+      renderReportCard();
+      renderMasterModel();
+      renderWatchRows();
+      renderPositionSizing();
+      renderChart();
+      renderRebalanceLog();
+      renderDailyTrace();
+    }
+
+    async function loadData(force = false) {
+      const response = await fetch(`/api/fund-dual-momentum-data${force ? "?force=1" : `?ts=${Date.now()}`}`);
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || payload.error || "双动量数据加载失败");
+      }
+      data = await response.json();
+      renderAll();
+      refreshDeadline = Date.now() + refreshMs;
+      updateCountdown();
+    }
+
+    function startAutoRefresh() {
+      clearInterval(refreshTimer);
+      clearInterval(countdownTimer);
+      refreshTimer = window.setInterval(async () => {
+        try {
+          await loadData(false);
+        } catch (error) {
+          setCacheStatus(`刷新失败：${error.message}`, true);
+        }
+      }, refreshMs);
+      countdownTimer = window.setInterval(updateCountdown, 1000);
+    }
+
+    document.getElementById("capitalInput").addEventListener("input", (event) => {
+      capital = Math.max(Number(event.target.value || 0), 0);
+      renderPositionSizing();
+    });
+
+    document.getElementById("forceRefreshBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("forceRefreshBtn");
+      btn.disabled = true;
+      btn.textContent = "正在刷新…";
+      try {
+        await loadData(true);
+      } catch (error) {
+        setCacheStatus(`刷新失败：${error.message}`, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "手动刷新最新数据";
+      }
+    });
+
+    loadData()
+      .then(startAutoRefresh)
+      .catch((error) => {
+        document.body.innerHTML = `<div style="padding:40px;font-family:PingFang SC, sans-serif;color:#223044;">双动量看板加载失败：${error.message}</div>`;
+      });
+  </script>
+</body>
+</html>

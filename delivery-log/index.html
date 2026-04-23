@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>项目交付说明台</title>
+    <style>
+      html { -webkit-text-size-adjust: 100%; }
+      :root {
+        --bg: #f4efe7;
+        --paper: #fbf8f2;
+        --ink: #223044;
+        --muted: #617187;
+        --line: rgba(34, 48, 68, 0.1);
+        --accent: #d17a46;
+        --accent-soft: rgba(209, 122, 70, 0.14);
+        --card: rgba(255, 255, 255, 0.82);
+        --shadow: 0 16px 40px rgba(48, 63, 86, 0.08);
+        --radius: 24px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Noto Serif SC", "Microsoft YaHei", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(209, 122, 70, 0.08), transparent 26%),
+          radial-gradient(circle at top right, rgba(67, 126, 172, 0.08), transparent 24%),
+          var(--bg);
+      }
+      a { color: inherit; }
+      .page {
+        width: min(1320px, calc(100vw - 32px));
+        margin: 18px auto 48px;
+      }
+      .board-nav {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .board-nav-links {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .board-nav-links::-webkit-scrollbar { display: none; }
+      .board-nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.78);
+        border: 1px solid rgba(34,48,68,0.08);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .board-nav-link.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: transparent;
+      }
+      .project-entry-btn {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: #223044;
+        color: #fff;
+        border: 1px solid transparent;
+        text-decoration: none;
+        white-space: nowrap;
+        box-shadow: 0 10px 24px rgba(34, 48, 68, 0.18);
+      }
+      .project-entry-btn:hover {
+        background: #1b2738;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.35fr 0.9fr;
+        gap: 18px;
+        padding: 28px;
+        border-radius: 32px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.76), rgba(255,255,255,0.92));
+        border: 1px solid rgba(255,255,255,0.6);
+        box-shadow: var(--shadow);
+      }
+      .eyebrow {
+        letter-spacing: 0.18em;
+        color: #4b8a96;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 10px 0 12px;
+        font-size: clamp(42px, 7vw, 70px);
+        line-height: 0.95;
+      }
+      .hero p {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.75;
+        color: #3a4960;
+      }
+      .pill-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .pill {
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(34,48,68,0.08);
+        background: rgba(255,255,255,0.88);
+        color: #44536a;
+        font-size: 14px;
+      }
+      .quickstart-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .quickstart-box {
+        border-radius: var(--radius);
+        border: 1px solid rgba(34,48,68,0.08);
+        background: rgba(255,255,255,0.82);
+        padding: 18px;
+      }
+      .quickstart-box h4 {
+        margin: 8px 0 10px;
+        font-size: 22px;
+        line-height: 1.2;
+      }
+      .quickstart-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 14px;
+      }
+      .quickstart-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 14px;
+      }
+      .hero-side {
+        padding: 22px;
+        border-radius: 28px;
+        background: linear-gradient(160deg, #2d3746, #243141);
+        color: #f9f5ee;
+      }
+      .hero-side h2 {
+        margin: 0 0 14px;
+        font-size: 32px;
+      }
+      .hero-side p {
+        color: rgba(249,245,238,0.82);
+        font-size: 16px;
+        line-height: 1.8;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .action-btn {
+        border: 1px solid rgba(34,48,68,0.08);
+        border-radius: 999px;
+        padding: 11px 18px;
+        background: rgba(255,255,255,0.9);
+        color: var(--ink);
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .action-btn.primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: transparent;
+      }
+      .action-btn.dark {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+        border-color: rgba(255,255,255,0.2);
+      }
+      .action-btn:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+      .grid {
+        display: grid;
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .card {
+        background: var(--card);
+        border: 1px solid rgba(255,255,255,0.65);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+      .metric .label, .section-label {
+        font-size: 13px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+      }
+      .metric .value {
+        margin-top: 10px;
+        font-size: 38px;
+        font-weight: 700;
+      }
+      .metric .note {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+      .toc-and-summary {
+        display: grid;
+        grid-template-columns: 0.9fr 1.4fr;
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .toc-list, .mini-list { display: grid; gap: 10px; margin-top: 16px; }
+      .toc-item, .mini-item {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(34,48,68,0.07);
+      }
+      .section {
+        margin-top: 18px;
+      }
+      .section h3 {
+        margin: 0 0 8px;
+        font-size: 34px;
+      }
+      .section > p {
+        margin: 0 0 18px;
+        color: #4a5970;
+        line-height: 1.9;
+        font-size: 16px;
+      }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .three-col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+      ul.clean {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: #334257;
+        line-height: 1.9;
+      }
+      .snapshot-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+      .snapshot-meta { margin-top: 12px; display: grid; gap: 8px; color: #4b5b70; font-size: 14px; }
+      .attachment-link {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        text-decoration: none;
+        color: #8c4f2b;
+        font-size: 14px;
+      }
+      details.tech {
+        margin-top: 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(34,48,68,0.08);
+        background: rgba(255,255,255,0.76);
+        overflow: hidden;
+      }
+      details.tech summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 18px 22px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      details.tech summary::-webkit-details-marker { display: none; }
+      .tech-body {
+        padding: 0 22px 22px;
+        color: #405068;
+        line-height: 1.9;
+      }
+      .footer-note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .editor-shell {
+        margin-top: 18px;
+      }
+      .editor-card {
+        display: none;
+      }
+      .editor-card.active {
+        display: block;
+      }
+      .editor-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .editor-meta {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .editor-box {
+        width: 100%;
+        min-height: 560px;
+        margin-top: 16px;
+        border-radius: 20px;
+        border: 1px solid rgba(34,48,68,0.1);
+        background: rgba(255,255,255,0.88);
+        padding: 18px;
+        font: 15px/1.8 "SFMono-Regular", "Menlo", "Monaco", "Courier New", monospace;
+        color: #2b3748;
+        resize: vertical;
+      }
+      .editor-status {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 1100px) {
+        .hero, .toc-and-summary, .two-col, .three-col, .snapshot-grid, .stats-grid, .quickstart-grid { grid-template-columns: 1fr; }
+        .project-entry-btn { margin-left: 0; }
+      }
+      @media (max-width: 720px) {
+        .page { width: min(100vw - 18px, 1320px); margin-top: 10px; }
+        .hero, .card { padding: 18px; border-radius: 22px; }
+        h1 { font-size: 46px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="board-nav">
+        <div class="board-nav-label">站内导航</div>
+        <div class="board-nav-links">
+          <a class="board-nav-link" href="/fund-board">基金主台</a>
+          <a class="board-nav-link" href="/fund-dual-momentum-board">双动量独立台</a>
+          <a class="board-nav-link" href="/fund-yield-board">基金高收益台</a>
+          <a class="board-nav-link" href="/fund-universe">全市场基金池</a>
+          <a class="board-nav-link" href="/stock-board">股票主台</a>
+          <a class="board-nav-link" href="/stock-yield-board">股票高收益台</a>
+          <a class="board-nav-link" href="/sector-board">易总行业量化</a>
+          <a class="board-nav-link" href="/us-stock-board">美股观察台</a>
+          <a class="board-nav-link active" href="/delivery-log">交付说明台</a>
+        </div>
+        <a class="project-entry-btn" href="/fund-board">进入量化看板项目</a>
+      </div>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Project Delivery Desk</div>
+          <h1>基金/股票量化看板<br/>项目交付说明台</h1>
+          <p>把项目迭代说明、问题修复闭环、能力展示口径、版本快照、问题快照和技术附录收成一个统一入口，方便对内汇报、对外展示和后续留档。</p>
+          <div class="pill-row">
+            <div class="pill">基金组合决策台</div>
+            <div class="pill">股票多策略决策台</div>
+            <div class="pill">iFinD 官方 HTTP</div>
+            <div class="pill">十年历史缓存</div>
+            <div class="pill">真实回测</div>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div class="section-label" style="color: rgba(249,245,238,0.7);">统一总文档</div>
+          <h2>一份入口看全局</h2>
+          <p>当前页面集中展示：项目背景、交付成果、修复闭环、能力体现、阶段状态、版本快照、问题快照以及技术附录。后续如需汇报、复盘、留档，优先查这一页。</p>
+          <div class="hero-actions">
+            <button class="action-btn dark" id="viewModeBtn" type="button">查看展示页</button>
+            <button class="action-btn primary" id="editModeBtn" type="button">编辑并保存文档</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 18px;">
+        <div class="section-label">Quick Start</div>
+        <h3>一眼看懂这页怎么用</h3>
+        <div class="quickstart-grid">
+          <div class="quickstart-box">
+            <div class="section-label">这页干什么</div>
+            <h4>项目总入口</h4>
+            <p>这里集中放项目定位、阶段结论、修复闭环、版本快照、技术附录和汇报口径，适合你自己复盘，也适合直接给别人看全局。</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">先看哪里</div>
+            <ol class="quickstart-list">
+              <li>先看上方 Hero 和指标卡，快速理解项目范围。</li>
+              <li>再看目录与摘要，抓住当前结论、问题闭环和能力展示。</li>
+              <li>最后看版本快照、问题快照和技术附录，补证据链。</li>
+            </ol>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">适合怎么展示</div>
+            <h4>先讲结果，再讲过程</h4>
+            <p>如果拿给朋友或领导看，建议先讲看板能力、策略数量、数据链路和当前迭代成果，再往下讲修复问题与研发证据。</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">当前重点</div>
+            <h4>量化看板 + 数据仓库</h4>
+            <p>当前最重要的是持续补厚历史数据库、优化基金与股票策略、把首屏展示和信号提示做到更容易理解、更方便执行。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="editor-shell">
+        <div class="card editor-card" id="editorCard">
+          <div class="section-label">网页内编辑</div>
+          <h3>直接修改并保存总文档</h3>
+          <p>这里编辑的是同一份总文档：[PROJECT_DELIVERY_LOG.md](/PROJECT_DELIVERY_LOG.md)。保存后会直接落盘，后续你在本地和汇报页里看到的内容都会同步更新。</p>
+          <div class="editor-toolbar">
+            <div class="editor-meta" id="editorMeta">正在读取文档内容…</div>
+            <div class="hero-actions" style="margin-top: 0;">
+              <button class="action-btn" id="reloadDocBtn" type="button">重新载入</button>
+              <button class="action-btn primary" id="saveDocBtn" type="button">保存文档</button>
+            </div>
+          </div>
+          <textarea class="editor-box" id="editorBox" spellcheck="false"></textarea>
+          <div class="editor-status" id="editorStatus">文档尚未载入。</div>
+        </div>
+      </section>
+
+      <div class="grid stats-grid">
+        <div class="card metric">
+          <div class="label">基金底池</div>
+          <div class="value">26464</div>
+          <div class="note">公募基金全市场快照规模</div>
+        </div>
+        <div class="card metric">
+          <div class="label">股票底池</div>
+          <div class="value">5502</div>
+          <div class="note">A 股全市场股票快照规模</div>
+        </div>
+        <div class="card metric">
+          <div class="label">基金策略</div>
+          <div class="value">6</div>
+          <div class="note">已接真实回测并接入看板</div>
+        </div>
+        <div class="card metric">
+          <div class="label">股票策略</div>
+          <div class="value">6</div>
+          <div class="note">已接本地历史回测与交易约束</div>
+        </div>
+      </div>
+
+      <div class="toc-and-summary">
+        <section class="card">
+          <div class="section-label">目录导航</div>
+          <div class="toc-list">
+            <div class="toc-item">一、项目背景</div>
+            <div class="toc-item">二、阶段目标</div>
+            <div class="toc-item">三、核心交付成果</div>
+            <div class="toc-item">四、关键问题与修复闭环</div>
+            <div class="toc-item">五、能力体现</div>
+            <div class="toc-item">六、当前状态 / 七、下一阶段建议</div>
+            <div class="toc-item">九、版本快照与问题快照</div>
+            <div class="toc-item">十、技术附录</div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="section-label">内容范围说明</div>
+          <div class="mini-list">
+            <div class="mini-item">集中收录：项目迭代说明、版本演进结果、问题修复闭环、对外展示口径、领导汇报素材、技术附录与附件索引。</div>
+            <div class="mini-item">对业务或管理层：重点看“核心交付成果、能力体现、当前状态、快照附件”。</div>
+            <div class="mini-item">对懂技术的领导：重点看“关键问题与修复闭环、技术附录”。</div>
+            <div class="mini-item">对后续项目留档：优先以这份页面和对应 Markdown 为唯一总入口，不再散落到聊天记录中。</div>
+          </div>
+          <a class="attachment-link" href="../PROJECT_DELIVERY_LOG.md">打开原始 Markdown 文档</a>
+        </section>
+      </div>
+
+      <section class="section card">
+        <div class="section-label">核心交付成果</div>
+        <h3>已形成的系统能力</h3>
+        <p>本阶段已经完成从“脚本集合”到“量化工作台”的升级，形成了数据接入、全市场底池、十年历史缓存、真实回测、本地服务与前端双看板的完整链路。</p>
+        <div class="three-col">
+          <div class="card" style="padding:18px;">
+            <div class="section-label">数据层</div>
+            <ul class="clean">
+              <li>iFinD 官方 HTTP 接入</li>
+              <li>股票/基金实时行情与基金估值</li>
+              <li>股票/基金十年历史缓存</li>
+              <li>本地 manifest 与增量更新</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div class="section-label">产品层</div>
+            <ul class="clean">
+              <li>基金组合决策台</li>
+              <li>股票多策略决策台</li>
+              <li>全市场基金池页</li>
+              <li>多策略卡片与翻面交互</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div class="section-label">策略层</div>
+            <ul class="clean">
+              <li>基金 6 套正式策略</li>
+              <li>股票 6 套正式策略</li>
+              <li>真实回测曲线、回撤、YTD</li>
+              <li>股票交易约束增强版回测</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="two-col">
+          <div class="card">
+            <div class="section-label">关键问题与修复闭环</div>
+            <h3>非功能性问题同样系统化收口</h3>
+            <ul class="clean">
+              <li>页面显示旧标题、旧策略、旧运行态</li>
+              <li>股票页打不开 / API 超时</li>
+              <li>基金首页精选池字段不完整</li>
+              <li>股票短线收益虚高</li>
+              <li>基金历史曲线早期为样例值</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="section-label">能力体现</div>
+            <h3>适合对领导展示的能力点</h3>
+            <ul class="clean">
+              <li>技术整合：接口、缓存、回测、前端整合成系统</li>
+              <li>问题诊断：从表象问题下钻到缓存、快照、服务层</li>
+              <li>产品化：从数据页升级为真实使用路径工作台</li>
+              <li>工程化：在额度约束下做出可持续运行的刷新策略</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section card">
+        <div class="section-label">版本快照与问题快照</div>
+        <h3>可直接作为汇报附件的材料</h3>
+        <div class="snapshot-grid">
+          <div class="card" style="padding:18px;">
+            <div class="section-label">当前版本快照</div>
+            <div class="snapshot-meta">
+              <div><strong>基金组合决策台快照：</strong>2026-04-16 00:14 / iFinD 官方HTTP</div>
+              <div><strong>股票多策略决策台快照：</strong>2026-04-16 00:18 / iFinD 官方HTTP</div>
+              <div><strong>基金全市场快照：</strong>26464 只</div>
+              <div><strong>股票全市场快照：</strong>5502 只</div>
+            </div>
+            <a class="attachment-link" href="../output/fund_board_snapshot.json">基金快照 JSON</a>
+            <a class="attachment-link" href="../output/stock_dashboard_snapshot.json">股票快照 JSON</a>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div class="section-label">问题现场快照</div>
+            <div class="snapshot-meta">
+              <div><strong>股票页旧策略/今年以来为空：</strong>保留问题现场截图</div>
+              <div><strong>基金页旧标题/旧运行态：</strong>保留问题现场截图</div>
+            </div>
+            <a class="attachment-link" href="/var/folders/x9/9tgk34711ks11zv2qm1pkbk80000gn/T/TemporaryItems/NSIRD_screencaptureui_9ETbXx/截屏2026-04-15%2021.55.47.png">股票问题截图</a>
+            <a class="attachment-link" href="/var/folders/x9/9tgk34711ks11zv2qm1pkbk80000gn/T/TemporaryItems/NSIRD_screencaptureui_YHaIUi/截屏2026-04-15%2021.33.59.png">基金问题截图</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section card">
+        <div class="section-label">技术附录</div>
+        <h3>面向技术管理者的阅读入口</h3>
+        <p>以下内容适合给看得懂技术的领导或协作方看，重点展示问题定位、根因和解决方案。保留在当前页面，避免再去翻 Markdown 原文。</p>
+
+        <details class="tech" open>
+          <summary>1. iFinD 接口路线选择</summary>
+          <div class="tech-body">
+            Mac 环境下明确统一到 iFinD 官方 HTTP API，而不是继续纠缠本地 SDK。这样解决了平台限制、网页登录态依赖和接口口径不一致的问题。
+          </div>
+        </details>
+        <details class="tech">
+          <summary>2. 旧标题 / 旧策略 / 旧快照显示问题</summary>
+          <div class="tech-body">
+            根因是浏览器缓存、服务内存缓存和磁盘快照优先级冲突。最终通过静态资源禁缓存、服务端优先读取最新快照、API 默认返回快照而不是同步重算来修复。
+          </div>
+        </details>
+        <details class="tech">
+          <summary>3. 股票页打不开 / API 卡死问题</summary>
+          <div class="tech-body">
+            根因是股票 payload 构建较重，而旧服务逻辑会在缓存过期后同步重算。现已改成先返回最新快照，仅在显式强刷时触发重算，避免页面阻塞。
+          </div>
+        </details>
+        <details class="tech">
+          <summary>4. 基金首页精选池质量问题</summary>
+          <div class="tech-body">
+            通过首页准入机制，把字段完整性、估值稳定性、实时可用性纳入筛选条件，占位字段多的基金下沉至全市场基金池页，首页仅保留更适合监控的精选层。
+          </div>
+        </details>
+        <details class="tech">
+          <summary>5. 股票短线收益虚高问题</summary>
+          <div class="tech-body">
+            在股票回测层加入手续费、滑点、冲击成本、高波动日惩罚、执行折扣及收益上下限约束，显著收敛超短/短线策略回测数字，使其更接近真实可执行区间。
+          </div>
+        </details>
+        <details class="tech">
+          <summary>6. 基金/股票历史回测口径统一问题</summary>
+          <div class="tech-body">
+            已建立股票与基金的全市场快照、十年历史缓存、本地读取和真实回测链路，形成统一的数据口径与可复用的本地缓存结构。
+          </div>
+        </details>
+      </section>
+
+      <div class="footer-note">
+        当前页面对应的原始总文档：<a href="../PROJECT_DELIVERY_LOG.md">PROJECT_DELIVERY_LOG.md</a>
+      </div>
+    </div>
+    <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+    <script>
+      const editorCard = document.getElementById("editorCard");
+      const editorBox = document.getElementById("editorBox");
+      const editorMeta = document.getElementById("editorMeta");
+      const editorStatus = document.getElementById("editorStatus");
+      const editModeBtn = document.getElementById("editModeBtn");
+      const viewModeBtn = document.getElementById("viewModeBtn");
+      const reloadDocBtn = document.getElementById("reloadDocBtn");
+      const saveDocBtn = document.getElementById("saveDocBtn");
+
+      let editorLoaded = false;
+
+      function setStatus(text, isError = false) {
+        editorStatus.textContent = text;
+        editorStatus.style.color = isError ? "#b2523c" : "var(--muted)";
+      }
+
+      async function loadDocument() {
+        setStatus("正在读取文档…");
+        try {
+          const response = await fetch("/api/delivery-log-markdown", { cache: "no-store" });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.message || data.error || "文档读取失败");
+          }
+          editorBox.value = data.content || "";
+          editorMeta.textContent = `当前文件：${data.path} ｜ 最近落盘：${data.updated_at || "--"}`;
+          editorLoaded = true;
+          setStatus("文档已载入，可以直接编辑后保存。");
+        } catch (error) {
+          setStatus(`读取失败：${error.message}`, true);
+        }
+      }
+
+      async function saveDocument() {
+        saveDocBtn.disabled = true;
+        setStatus("正在保存文档…");
+        try {
+          const response = await fetch("/api/delivery-log-markdown", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: editorBox.value }),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.message || data.error || "文档保存失败");
+          }
+          editorMeta.textContent = `当前文件：${data.path} ｜ 最近落盘：${data.updated_at || "--"}`;
+          setStatus("保存成功，文档内容已经落盘。");
+        } catch (error) {
+          setStatus(`保存失败：${error.message}`, true);
+        } finally {
+          saveDocBtn.disabled = false;
+        }
+      }
+
+      function showEditor() {
+        editorCard.classList.add("active");
+        editModeBtn.disabled = true;
+        viewModeBtn.disabled = false;
+        if (!editorLoaded) {
+          loadDocument();
+        }
+        editorCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function hideEditor() {
+        editorCard.classList.remove("active");
+        editModeBtn.disabled = false;
+        viewModeBtn.disabled = true;
+      }
+
+      editModeBtn.addEventListener("click", showEditor);
+      viewModeBtn.addEventListener("click", hideEditor);
+      reloadDocBtn.addEventListener("click", loadDocument);
+      saveDocBtn.addEventListener("click", saveDocument);
+      viewModeBtn.disabled = true;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2417 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>股票多策略决策台</title>
+    <style>
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      :root {
+        --bg: #f5efe6;
+        --paper: rgba(255, 251, 245, 0.84);
+        --paper-strong: rgba(255, 248, 240, 0.92);
+        --ink: #182433;
+        --muted: #607080;
+        --line: rgba(24, 36, 51, 0.09);
+        --accent: #bf5a36;
+        --accent-2: #1e6f68;
+        --accent-3: #d29a2d;
+        --good: #14825d;
+        --bad: #b64a33;
+        --shadow: 0 26px 80px rgba(66, 43, 23, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at 0% 0%, rgba(191, 90, 54, 0.14), transparent 26%),
+          radial-gradient(circle at 100% 0%, rgba(30, 111, 104, 0.14), transparent 24%),
+          linear-gradient(180deg, #f7f2ea 0%, #efe7db 100%);
+      }
+
+      .shell {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding:
+          max(14px, env(safe-area-inset-top))
+          max(14px, env(safe-area-inset-right))
+          max(20px, env(safe-area-inset-bottom))
+          max(14px, env(safe-area-inset-left));
+        padding-inline: clamp(14px, 2.4vw, 24px);
+      }
+
+      .board-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .board-nav-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .board-nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .board-nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(24, 36, 51, 0.08);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .board-nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #d57f58);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 30px;
+        border-radius: 34px;
+        background: linear-gradient(135deg, rgba(255, 249, 242, 0.96), rgba(246, 238, 228, 0.88));
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        box-shadow: var(--shadow);
+      }
+
+      .hero::before,
+      .hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(2px);
+      }
+
+      .hero::before {
+        width: 280px;
+        height: 280px;
+        right: -80px;
+        top: -60px;
+        background: rgba(191, 90, 54, 0.16);
+      }
+
+      .hero::after {
+        width: 260px;
+        height: 260px;
+        left: -70px;
+        bottom: -120px;
+        background: rgba(30, 111, 104, 0.13);
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-family: "Source Han Serif SC", "Songti SC", "STSong", serif;
+        font-size: clamp(42px, 6vw, 82px);
+        line-height: 0.94;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-subtitle {
+        max-width: 64ch;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .hero-pills,
+      .plan-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(24, 36, 51, 0.07);
+        background: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+      }
+
+      .status-pill {
+        background: rgba(30, 111, 104, 0.1);
+        color: var(--accent-2);
+      }
+
+      .status-pill.error {
+        background: rgba(182, 74, 51, 0.12);
+        color: var(--bad);
+      }
+
+      .hero-plan {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+        border-radius: 28px;
+        background: rgba(20, 29, 42, 0.94);
+        color: #f8f1e7;
+      }
+
+      .hero-plan .small {
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(248, 241, 231, 0.62);
+      }
+
+      .hero-plan h2 {
+        margin: 0;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+
+      .hero-plan p {
+        margin: 0;
+        line-height: 1.7;
+        color: rgba(248, 241, 231, 0.82);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+        padding: 22px;
+      }
+
+      .span-12 { grid-column: span 12; }
+      .span-8 { grid-column: span 8; }
+      .span-7 { grid-column: span 7; }
+      .span-6 { grid-column: span 6; }
+      .span-5 { grid-column: span 5; }
+      .span-4 { grid-column: span 4; }
+
+      .section-label {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .section-head h3 {
+        margin: 8px 0 0;
+        font-size: 28px;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+      }
+
+      .section-sub {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .metric-grid,
+      .control-grid,
+      .strategy-summary-strip,
+      .strategy-compare-grid,
+      .strategy-kpi-grid,
+      .monitor-grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .control-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .strategy-summary-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .strategy-compare-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .strategy-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .monitor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .quickstart-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+      .metric,
+      .control-card,
+      .strategy-summary-card,
+      .monitor-card,
+      .quickstart-box {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.64);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .quickstart-box h4 {
+        margin: 8px 0 10px;
+        font-size: 22px;
+        line-height: 1.2;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+      }
+
+      .quickstart-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 14px;
+      }
+
+      .quickstart-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 14px;
+      }
+
+      .metric .name,
+      .control-note,
+      .strategy-summary-copy,
+      .monitor-card p,
+      .fund-meta,
+      .calc-note,
+      .news-item p {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .metric .number,
+      .control-value,
+      .monitor-card .value {
+        margin-top: 10px;
+        font-size: 28px;
+        line-height: 1.1;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+      }
+
+      .control-input {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .control-input input,
+      .calc-input input {
+        width: 100%;
+        border: 1px solid rgba(24, 36, 51, 0.1);
+        background: rgba(255,255,255,0.82);
+        border-radius: 16px;
+        padding: 12px 14px;
+        font: inherit;
+        color: var(--ink);
+      }
+
+      .refresh-btn,
+      .ghost-btn,
+      .tab-btn {
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .refresh-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        border: 0;
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: linear-gradient(90deg, var(--accent), #d67e56);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .ghost-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(24, 36, 51, 0.1);
+        border-radius: 14px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.78);
+        color: var(--ink);
+      }
+
+      .ticker-wrap {
+        overflow: hidden;
+        border-radius: 20px;
+        background: rgba(20, 29, 42, 0.96);
+        color: #f8f1e7;
+      }
+
+      .ticker-track {
+        display: flex;
+        width: max-content;
+        animation: ticker 34s linear infinite;
+      }
+
+      .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 22px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: nowrap;
+      }
+
+      .group-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .tab-btn {
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(24, 36, 51, 0.06);
+        color: var(--ink);
+      }
+
+      .tab-btn.active {
+        background: linear-gradient(90deg, var(--accent), #d47b52);
+        color: #fff7f0;
+      }
+
+      .table-wrap,
+      .calc-table {
+        overflow: auto;
+        border-radius: 22px;
+        border: 1px solid rgba(24, 36, 51, 0.06);
+        background: rgba(255, 255, 255, 0.54);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 13px 14px;
+        text-align: left;
+        font-size: 14px;
+        border-bottom: 1px solid var(--line);
+        white-space: nowrap;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(244, 239, 231, 0.95);
+        position: sticky;
+        top: 0;
+      }
+
+      .fund-name { font-weight: 700; }
+      .up { color: var(--good); }
+      .down { color: var(--bad); }
+      .flat { color: var(--muted); }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: rgba(30, 111, 104, 0.1);
+        color: var(--accent-2);
+      }
+
+      .signal-buy { background: rgba(20, 130, 93, 0.12); color: var(--good); }
+      .signal-hold { background: rgba(210, 154, 45, 0.16); color: #9a6f0a; }
+      .signal-sell { background: rgba(182, 74, 51, 0.12); color: var(--bad); }
+
+      .spotlight-card {
+        padding: 20px;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(20, 29, 42, 0.94), rgba(28, 39, 54, 0.92));
+        color: #f8f1e7;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .spotlight-top,
+      .strategy-top,
+      .calc-top,
+      .news-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .spotlight-card h4,
+      .strategy-card h4,
+      .strategy-summary-card h4 {
+        margin: 0;
+        font-family: "Source Han Serif SC", "Songti SC", serif;
+      }
+
+      .spotlight-card h4 { font-size: 30px; line-height: 1.1; }
+      .strategy-card h4 { font-size: 22px; }
+      .strategy-summary-card h4 { font-size: 20px; }
+
+      .spotlight-copy {
+        margin-top: 12px;
+        color: rgba(248, 241, 231, 0.78);
+        line-height: 1.7;
+      }
+
+      .spotlight-badge {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff3e8;
+      }
+
+      .strategy-kpi,
+      .summary-metric,
+      .calc-metric {
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .strategy-kpi {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255,255,255,0.06);
+      }
+
+      .strategy-kpi .label,
+      .summary-metric .label,
+      .calc-metric .label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .strategy-kpi .label { color: rgba(248, 241, 231, 0.62); }
+
+      .strategy-kpi .value,
+      .summary-metric .value,
+      .calc-metric .value {
+        margin-top: 8px;
+        font-size: 22px;
+      }
+
+      .strategy-card,
+      .news-item {
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.5));
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .strategy-flip {
+        position: relative;
+        perspective: 1600px;
+      }
+
+      .strategy-flip-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.56s ease;
+        transform-style: preserve-3d;
+      }
+
+      .strategy-flip.is-flipped .strategy-flip-inner {
+        transform: rotateY(180deg);
+      }
+
+      .strategy-face {
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+
+      .strategy-face.back {
+        position: absolute;
+        inset: 0;
+        transform: rotateY(180deg);
+      }
+
+      .flip-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .flip-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .flip-copy {
+        margin-top: 10px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .flip-back-copy {
+        margin-top: 10px;
+        color: rgba(248, 241, 231, 0.84);
+        line-height: 1.65;
+      }
+
+      .flip-front-shell .strategy-meta {
+        margin-top: 10px;
+      }
+
+      .flip-back-shell {
+        height: 100%;
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(20, 29, 42, 0.92), rgba(31, 42, 58, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #f8f1e7;
+      }
+
+      .flip-back-shell .section-label,
+      .flip-back-shell .strategy-copy,
+      .flip-back-shell .strategy-meta,
+      .flip-back-shell .detail-list,
+      .flip-back-shell .detail-card h5,
+      .flip-back-shell .source-link {
+        color: rgba(248, 241, 231, 0.76);
+      }
+
+      .flip-back-shell .summary-metric,
+      .flip-back-shell .detail-card,
+      .flip-back-shell .mini-chart-shell {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .flip-back-shell .detail-chip {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f8f1e7;
+      }
+
+      .flip-back-shell .ghost-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: #f8f1e7;
+      }
+
+      .strategy-copy,
+      .strategy-meta,
+      .plan-block li {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .summary-metrics,
+      .calc-grid,
+      .allocation-bars,
+      .plan-block,
+      .news-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .summary-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
+      .calc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
+      .allocation-bars { margin-top: 14px; }
+      .plan-block { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 14px; }
+
+      .allocation-row {
+        display: grid;
+        grid-template-columns: 88px 1fr 48px;
+        gap: 12px;
+        align-items: center;
+        font-size: 13px;
+      }
+
+      .bar-track {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(24, 36, 51, 0.08);
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-3));
+      }
+
+      .plan-cell {
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.54);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .plan-cell strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+
+      .plan-cell ul {
+        margin: 0;
+        padding-left: 16px;
+      }
+
+      .calc-shell {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 20px;
+        background: rgba(20, 29, 42, 0.04);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .calc-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .strategy-detail {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.58);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .detail-card {
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(20, 29, 42, 0.035);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+      }
+
+      .detail-card h5 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .detail-chip {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+        font-size: 12px;
+        color: var(--ink);
+      }
+
+      .detail-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .detail-stat-strip {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .detail-stat {
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .detail-stat .label,
+      .detail-stat .note {
+        font-size: 12px;
+        color: rgba(248, 241, 231, 0.68);
+      }
+
+      .detail-stat .value {
+        margin-top: 8px;
+        font-size: 18px;
+        color: #f8f1e7;
+      }
+
+      .detail-note {
+        margin-bottom: 10px;
+        color: rgba(248, 241, 231, 0.72);
+        line-height: 1.6;
+        font-size: 13px;
+      }
+
+      .detail-table-shell {
+        margin-top: 10px;
+        max-height: 260px;
+        overflow: auto;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 10px;
+        vertical-align: top;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: normal;
+      }
+
+      .detail-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(20, 29, 42, 0.95);
+        color: rgba(248, 241, 231, 0.68);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .source-stack {
+        display: grid;
+        gap: 8px;
+      }
+
+      .source-pill {
+        display: grid;
+        gap: 2px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(248, 241, 231, 0.88);
+        font-size: 12px;
+      }
+
+      .source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        color: var(--accent-2);
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      .mini-chart-shell {
+        margin-top: 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(24, 36, 51, 0.06);
+        padding: 10px 12px 8px;
+      }
+
+      .mini-chart-title {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .mini-chart {
+        width: 100%;
+        height: 92px;
+      }
+
+      .chart-shell {
+        width: 100%;
+        overflow: auto;
+      }
+
+      svg {
+        width: 100%;
+        height: 280px;
+        display: block;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .line-swatch {
+        width: 24px;
+        height: 0;
+        border-top: 3px solid var(--muted);
+        border-radius: 999px;
+      }
+
+      .footnote,
+      .footer {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @keyframes ticker {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      @media (max-width: 1220px) {
+        .hero-grid,
+        .metric-grid,
+        .quickstart-grid,
+        .control-grid,
+        .strategy-summary-strip,
+        .strategy-compare-grid,
+        .strategy-kpi-grid,
+        .monitor-grid,
+        .summary-metrics,
+        .calc-grid,
+        .plan-block {
+          grid-template-columns: 1fr;
+        }
+
+        .span-8,
+        .span-7,
+        .span-6,
+        .span-5,
+        .span-4 {
+          grid-column: span 12;
+        }
+
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: clamp(36px, 8vw, 56px);
+        }
+
+        .hero-plan {
+          padding: 18px;
+        }
+
+        .metric-grid,
+        .quickstart-grid,
+        .control-grid,
+        .strategy-summary-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .strategy-kpi-grid,
+        .summary-metrics,
+        .detail-stat-strip,
+        .calc-grid,
+        .plan-block,
+        .monitor-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell { padding: 14px; }
+        .hero, .card { padding: 18px; border-radius: 22px; }
+        h1 { font-size: 42px; }
+        .quickstart-grid { grid-template-columns: 1fr; }
+        .board-nav {
+          align-items: stretch;
+        }
+        .board-nav-links {
+          width: 100%;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          padding-bottom: 4px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .board-nav-links::-webkit-scrollbar { display: none; }
+        .board-nav-link {
+          flex: 0 0 auto;
+          min-width: 132px;
+        }
+        .hero-pills, .plan-pills, .group-tabs { gap: 8px; }
+        .pill, .tab-btn { width: 100%; justify-content: center; }
+        .hero-plan h2 { font-size: 28px; }
+        th, td { padding: 12px 10px; }
+        .ticker-track { animation-duration: 34s; }
+        .table-wrap, .calc-table { border: 0; background: transparent; overflow: visible; }
+        .table-wrap table, .table-wrap thead, .table-wrap tbody, .table-wrap th, .table-wrap td, .table-wrap tr,
+        .calc-table table, .calc-table thead, .calc-table tbody, .calc-table th, .calc-table td, .calc-table tr {
+          display: block; width: 100%;
+        }
+        .table-wrap thead, .calc-table thead { display: none; }
+        .table-wrap tbody, .calc-table tbody { display: grid; gap: 12px; }
+        .table-wrap tr, .calc-table tr {
+          border-radius: 18px; padding: 10px 12px; background: rgba(255,255,255,0.68);
+          border: 1px solid rgba(24,36,51,0.08);
+        }
+        .table-wrap td, .calc-table td {
+          border-bottom: 0; white-space: normal; display: grid; grid-template-columns: 92px 1fr;
+          gap: 10px; padding: 7px 0;
+        }
+        .table-wrap td::before, .calc-table td::before {
+          content: attr(data-label); color: var(--muted); font-size: 12px; letter-spacing: 0.04em;
+        }
+        .calc-input {
+          width: 100%;
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .detail-stat-strip,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <nav class="board-nav" aria-label="看板跳转">
+        <div class="board-nav-label">站内导航</div>
+        <div class="board-nav-links">
+          <a class="board-nav-link" href="/fund-board">基金主台</a>
+          <a class="board-nav-link" href="/fund-dual-momentum-board">双动量独立台</a>
+          <a class="board-nav-link" href="/fund-yield-board">基金高收益台</a>
+          <a class="board-nav-link" href="/fund-universe">全市场基金池</a>
+          <a class="board-nav-link active" href="/stock-board">股票主台</a>
+          <a class="board-nav-link" href="/stock-yield-board">股票高收益台</a>
+          <a class="board-nav-link" href="/sector-board">易总行业量化</a>
+          <a class="board-nav-link" href="/us-stock-board">美股观察台</a>
+          <a class="board-nav-link" href="/delivery-log">交付说明台</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">Stock Multi-Strategy Decision Desk</div>
+            <h1 id="title">股票多策略决策台</h1>
+            <div class="hero-subtitle" id="subtitle"></div>
+            <div class="hero-pills">
+              <span class="pill" id="asOfPill"></span>
+              <span class="pill" id="sourcePill"></span>
+              <span class="pill" id="watchPill"></span>
+              <span class="pill" id="rebalancePill"></span>
+              <span class="pill status-pill" id="refreshStatusPill">自动刷新未启动</span>
+            </div>
+          </div>
+          <div class="hero-plan">
+            <div class="small" id="planTitle"></div>
+            <h2 id="planName"></h2>
+            <p id="planSummary"></p>
+            <div class="plan-pills">
+              <span class="pill" id="regimePill"></span>
+              <span class="pill" id="headlinePill"></span>
+            </div>
+            <p id="deskStatus"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Quick Start</div>
+            <h3>一眼看懂这页怎么用</h3>
+          </div>
+          <div class="section-sub">股票页要同时兼顾中线主策略和盘中战术层，所以我把最适合给朋友看的一眼信息压在了最上面。</div>
+        </div>
+        <div class="quickstart-grid">
+          <div class="quickstart-box">
+            <div class="section-label">这页干什么</div>
+            <h4 id="quickIntroTitle">--</h4>
+            <p id="quickIntroCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">先看哪里</div>
+            <div id="quickLookList"></div>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">当前执行结论</div>
+            <h4 id="quickDecisionTitle">--</h4>
+            <p id="quickDecisionCopy">--</p>
+          </div>
+          <div class="quickstart-box">
+            <div class="section-label">历史表现速览</div>
+            <h4 id="quickPerformanceTitle">--</h4>
+            <p id="quickPerformanceCopy">--</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Control Strip</div>
+            <h3>今日决策总控条</h3>
+          </div>
+          <div class="section-sub">先看市场状态，再看默认策略，最后按每套策略独立金额做执行测算。</div>
+        </div>
+        <div class="control-grid">
+          <div class="control-card">
+            <div class="section-label">市场判断</div>
+            <div class="control-value" id="controlRegime">--</div>
+            <div class="control-note" id="controlHeadline">--</div>
+          </div>
+          <div class="control-card">
+            <div class="section-label">默认策略</div>
+            <div class="control-value" id="controlPlanName">--</div>
+            <div class="control-note" id="controlPlanFit">--</div>
+          </div>
+          <div class="control-card">
+            <div class="section-label">数据状态</div>
+            <div class="control-value" id="controlDataSource">--</div>
+            <div class="control-note" id="controlRefreshStatus">--</div>
+          </div>
+          <div class="control-card">
+            <label class="control-input">
+              <span>默认总仓位金额</span>
+              <input id="globalCapitalInput" type="number" min="0" step="1000" value="100000" />
+            </label>
+            <div class="control-note">这是默认参考值。每套股票策略都可以单独设置自己的资金规模。</div>
+          </div>
+          <div class="control-card">
+            <button class="refresh-btn" id="manualRefreshBtn">手动刷新最新数据</button>
+            <div class="control-note">默认走缓存。只在你需要确认最新 iFinD 价格时再强制刷新。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Real-Time Tape</div>
+              <h3>股票实时行情跑马道</h3>
+            </div>
+            <div class="section-sub">把默认策略、候选池、观察名单里的关键标的放到一条实时带里，先感知市场脉冲。</div>
+          </div>
+          <div class="ticker-wrap">
+            <div class="ticker-track" id="tickerTrack"></div>
+          </div>
+        </article>
+
+        <article class="card span-8">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Decision Table</div>
+              <h3>股票实时监控表</h3>
+            </div>
+            <div class="group-tabs" id="groupTabs"></div>
+          </div>
+          <div class="section-sub" id="groupDescription"></div>
+          <div class="table-wrap" style="margin-top:14px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>股票</th>
+                  <th>策略 / 行业</th>
+                  <th>最新价</th>
+                  <th>涨跌幅</th>
+                  <th>动作</th>
+                  <th>目标仓位</th>
+                  <th>备注</th>
+                </tr>
+              </thead>
+              <tbody id="watchTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card span-4">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Default Strategy</div>
+              <h3>默认策略决策卡</h3>
+            </div>
+            <div class="section-sub">首屏先看这一张，解决“今天主要执行哪套股票方案”的问题。</div>
+          </div>
+          <div id="featuredStrategy"></div>
+        </article>
+
+        <article class="card span-8">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Decision Governance</div>
+              <h3>主执行策略与下一步预告</h3>
+            </div>
+            <div class="section-sub">不是只看哪套策略涨得多，而是把当前主执行、备选策略、覆盖度和下一轮复核重点一起说清楚。</div>
+          </div>
+          <div class="monitor-grid" id="governanceGrid"></div>
+          <div class="news-list" id="governanceList" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Training Expansion Queue</div>
+              <h3>训练数据扩容优先队列</h3>
+            </div>
+            <div class="section-sub">把股票历史库下一步该补什么直接讲清楚，先分“已测算层待补”和“全市场发现层待补”，避免只在旧样本里反复打转。</div>
+          </div>
+          <div class="monitor-grid" id="trainingPriorityGrid"></div>
+          <div class="news-list" id="trainingPriorityList" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Intraday Training Lab</div>
+              <h3>盘中训练样本库</h3>
+            </div>
+            <div class="section-sub">把实时快照真正沉淀成训练观察，看看哪些盘中动作在最近样本里更有胜率，不再只凭直觉做高抛低吸。</div>
+          </div>
+          <div class="monitor-grid" id="intradayTrainingGrid"></div>
+          <div class="news-list" id="intradayTrainingList" style="margin-top:14px;"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Strategy Compare</div>
+              <h3>量化策略横向比较</h3>
+            </div>
+            <div class="section-sub">多策略！多策略！多策略！这里会把进攻、防守、趋势、低回撤并排比较。</div>
+          </div>
+          <div class="strategy-summary-strip" id="strategySummaryStrip"></div>
+          <div style="margin-top:14px;" class="strategy-compare-grid" id="strategyGrid"></div>
+        </article>
+
+        <article class="card span-12">
+          <div class="metric-grid" id="metricGrid"></div>
+        </article>
+
+        <article class="card span-7">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Strategy Performance</div>
+              <h3>策略表现对比</h3>
+            </div>
+            <div class="section-sub" id="perfSub"></div>
+          </div>
+          <div class="legend" id="legend"></div>
+          <div class="chart-shell">
+            <svg id="perfChart" viewBox="0 0 720 280" preserveAspectRatio="none"></svg>
+          </div>
+        </article>
+
+        <article class="card span-5">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Desk Signals</div>
+              <h3>盘中提示板</h3>
+            </div>
+          </div>
+          <div class="monitor-grid" id="monitorGrid"></div>
+        </article>
+
+        <article class="card span-7">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Intraday Overlay</div>
+              <h3>盘中战术覆盖层</h3>
+            </div>
+            <div class="section-sub" id="intradayOverlaySummary"></div>
+          </div>
+          <div class="monitor-grid" id="intradayOverlayGrid"></div>
+          <div class="table-wrap" style="margin-top:14px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>股票</th>
+                  <th>状态</th>
+                  <th>动作</th>
+                  <th>调整</th>
+                  <th>信心</th>
+                  <th>盘中位置</th>
+                  <th>原因</th>
+                </tr>
+              </thead>
+              <tbody id="intradayOverlayBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card span-7">
+          <div class="section-head">
+            <div>
+              <div class="section-label">Tomorrow Plan</div>
+              <h3>明日交易计划</h3>
+            </div>
+            <div class="section-sub" id="tomorrowPlanSummary"></div>
+          </div>
+          <div class="news-list" id="tomorrowPlanCards"></div>
+        </article>
+
+        <article class="card span-5">
+          <div class="section-head">
+            <div>
+              <div class="section-label">News & Alerts</div>
+              <h3>资讯与风险雷达</h3>
+            </div>
+          </div>
+          <div class="news-list" id="newsList"></div>
+        </article>
+      </section>
+
+      <div class="footer" id="footerNote">股票多策略决策台当前使用服务端缓存刷新。</div>
+    </div>
+
+    <script src="../theme_switcher.js"></script>
+    <script src="../cloud_static_runtime.js"></script>
+    <script>
+      const colors = ["#bf5a36", "#1e6f68", "#d89a1d", "#6b7a90", "#c96a3d", "#25796e", "#5e6472"];
+      const refreshMs = 30000;
+      let data = null;
+      let activeGroupId = "all";
+      let globalCapital = 100000;
+      let capitalByStrategy = {};
+      let refreshTimer = null;
+      let countdownTimer = null;
+      let refreshDeadline = null;
+      let refreshErrorActive = false;
+
+      function formatPct(value) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        const number = Number(value);
+        return `${number > 0 ? "+" : ""}${number.toFixed(2)}%`;
+      }
+
+      function formatSigned(value, digits = 1) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        const number = Number(value);
+        return `${number > 0 ? "+" : ""}${number.toFixed(digits)}%`;
+      }
+
+      function formatPrice(value) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        return Number(value).toFixed(2);
+      }
+
+      function formatMoney(value) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        return `¥${Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      function toneClass(value) {
+        if (value === null || value === undefined || Number(value) === 0) return "flat";
+        return Number(value) > 0 ? "up" : "down";
+      }
+
+      function signalClass(signal) {
+        if (!signal) return "signal-hold";
+        if (signal.includes("买") || signal.includes("增") || signal.includes("参与") || signal.includes("低吸") || signal.includes("跟随") || signal.includes("回补")) return "signal-buy";
+        if (signal.includes("卖") || signal.includes("减") || signal.includes("回避") || signal.includes("止盈") || signal.includes("防守")) return "signal-sell";
+        return "signal-hold";
+      }
+
+      function cacheModeText(cache) {
+        if (!cache) return "自动刷新待初始化";
+        const age = cache.age_seconds ?? 0;
+        const ttl = cache.ttl_seconds ?? 0;
+        const modeMap = {
+          fresh: "刚刷新",
+          cached: "缓存复用",
+          stale_snapshot: "快照兜底",
+          refreshing_snapshot: "后台刷新中",
+          refresh_in_progress: "后台刷新中",
+          refresh_failed_snapshot: "刷新失败已兜底",
+        };
+        const mode = modeMap[cache.mode] || cache.mode || "缓存状态";
+        return `${mode} · 已缓存 ${age}s / ${ttl}s`;
+      }
+
+      function setRefreshStatus(text, isError = false) {
+        const node = document.getElementById("refreshStatusPill");
+        node.textContent = text;
+        node.classList.toggle("error", isError);
+        refreshErrorActive = isError;
+      }
+
+      function strategyPerformanceValue(model) {
+        return formatSigned(model.since_start, 1);
+      }
+
+      function strategyDrawdownHint(model) {
+        if (model.max_drawdown !== null && model.max_drawdown !== undefined && !Number.isNaN(Number(model.max_drawdown))) {
+          return formatSigned(model.max_drawdown, 1);
+        }
+        const text = model.risk || "";
+        const matched = text.match(/-?\d+(\.\d+)?%/);
+        return matched ? matched[0] : text || "--";
+      }
+
+      function buildMiniBacktestSVG(values, color = "#bf5a36") {
+        if (!values || !values.length) {
+          return `<svg class="mini-chart" viewBox="0 0 240 92" preserveAspectRatio="none"></svg>`;
+        }
+        const width = 240;
+        const height = 92;
+        const pad = 8;
+        const min = Math.min(...values, 0);
+        const max = Math.max(...values, 1);
+        const innerWidth = width - pad * 2;
+        const innerHeight = height - pad * 2;
+        const points = values.map((value, index) => {
+          const x = pad + (innerWidth * index) / Math.max(values.length - 1, 1);
+          const ratio = (value - min) / Math.max(max - min, 1);
+          const y = height - pad - ratio * innerHeight;
+          return `${x},${y}`;
+        }).join(" ");
+        const areaPoints = `${pad},${height - pad} ${points} ${width - pad},${height - pad}`;
+        return `
+          <svg class="mini-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            <polyline fill="none" stroke="rgba(248,241,231,0.12)" stroke-width="1" points="${pad},${pad} ${pad},${height - pad} ${width - pad},${height - pad}" />
+            <polygon fill="rgba(191,90,54,0.10)" points="${areaPoints}" />
+            <polyline fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+          </svg>
+        `;
+      }
+
+      function rebalanceRuleLabel(rule) {
+        const mapping = { "M": "月度调仓", "W-FRI": "周度调仓", "2W-FRI": "双周调仓" };
+        return mapping[rule] || rule || "--";
+      }
+
+      function formatDetailPct(value, digits = 2) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
+        const number = Number(value);
+        return `${number > 0 ? "+" : ""}${number.toFixed(digits)}%`;
+      }
+
+      function renderStrategyDetail(model, color = "#bf5a36") {
+        const indicators = model.indicators || [];
+        const logic = model.logic || [];
+        const sourceLink = model.source_link || "";
+        const sourceText = model.source || "策略来源待补充";
+        const series = model.backtest_series || [];
+        const startDate = model.backtest_start_date || data.stats.since_start_date || "--";
+        const endDate = model.backtest_end_date || data.meta.as_of?.slice(0, 10) || "--";
+        const ytdDate = model.ytd_start_date || data.stats.ytd_start_date || "--";
+        const coverage = model.coverage_text || "--";
+        const rebalanceLog = model.rebalance_log || [];
+        const dailyTrace = (model.daily_trace || []).slice(-40).reverse();
+        return `
+          <div class="strategy-detail">
+            <div class="detail-stat-strip">
+              <div class="detail-stat">
+                <div class="label">起始日期</div>
+                <div class="value">${startDate}</div>
+              </div>
+              <div class="detail-stat">
+                <div class="label">结束日期</div>
+                <div class="value">${endDate}</div>
+              </div>
+              <div class="detail-stat">
+                <div class="label">今年以来</div>
+                <div class="value">${formatSigned(model.ytd_return, 1)}</div>
+                <div class="note">自 ${ytdDate} 起</div>
+              </div>
+              <div class="detail-stat">
+                <div class="label">最大回撤</div>
+                <div class="value">${strategyDrawdownHint(model)}</div>
+              </div>
+              <div class="detail-stat">
+                <div class="label">调仓频率</div>
+                <div class="value">${rebalanceRuleLabel(model.rebalance_rule)}</div>
+              </div>
+              <div class="detail-stat">
+                <div class="label">历史覆盖率</div>
+                <div class="value">${coverage}</div>
+              </div>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h5>运算指标</h5>
+                <div class="chip-list">
+                  ${indicators.map((item) => `<span class="detail-chip">${item}</span>`).join("")}
+                </div>
+              </div>
+              <div class="detail-card">
+                <h5>策略来源</h5>
+                <div class="strategy-copy" style="margin:0;">${sourceText}</div>
+                ${sourceLink ? `<a class="source-link" href="${sourceLink}" target="_blank" rel="noreferrer">查看原始来源</a>` : ""}
+              </div>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h5>运算逻辑</h5>
+                <ul class="detail-list">${logic.map((item) => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="detail-card">
+                <h5>历史回测曲线</h5>
+                <div class="mini-chart-shell">
+                  <div class="mini-chart-title">自起始日累计收益曲线 · ${startDate} 至 ${endDate}</div>
+                  ${buildMiniBacktestSVG(series, color)}
+                </div>
+              </div>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h5>调仓过程</h5>
+                <div class="detail-note">记录每个调仓日持仓权重怎么调整，方便快速回看超短、短线和中线策略是如何切换股票池的。</div>
+                <div class="detail-table-shell">
+                  <table class="detail-table">
+                    <thead>
+                      <tr>
+                        <th>调仓日</th>
+                        <th>当日持仓变化</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${rebalanceLog.map((entry) => `
+                        <tr>
+                          <td>${entry.date}</td>
+                          <td>
+                            <div class="source-stack">
+                              ${(entry.holdings || []).map((holding) => `
+                                <div class="source-pill">
+                                  <strong>${holding.name} (${holding.code})</strong>
+                                  <span>目标仓位 ${formatDetailPct(holding.weight_pct, 1)}</span>
+                                  <span>较上次变化 ${formatDetailPct(holding.delta_pct, 1)}</span>
+                                </div>
+                              `).join("")}
+                            </div>
+                          </td>
+                        </tr>
+                      `).join("") || `<tr><td colspan="2">暂无调仓记录</td></tr>`}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="detail-card">
+                <h5>逐日收益来源</h5>
+                <div class="detail-note">展示最近 40 个交易日的组合日收益、累计收益，以及当天主要收益来自哪些股票与仓位暴露。</div>
+                <div class="detail-table-shell">
+                  <table class="detail-table">
+                    <thead>
+                      <tr>
+                        <th>日期</th>
+                        <th>当日收益</th>
+                        <th>累计收益</th>
+                        <th>来源股票</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${dailyTrace.map((entry) => `
+                        <tr>
+                          <td>${entry.date}${entry.is_rebalance ? `<div class="fund-meta">调仓日</div>` : ""}</td>
+                          <td class="${toneClass(entry.portfolio_return_pct)}">${formatDetailPct(entry.portfolio_return_pct, 3)}</td>
+                          <td class="${toneClass(entry.cumulative_return_pct)}">${formatDetailPct(entry.cumulative_return_pct, 2)}</td>
+                          <td>
+                            <div class="source-stack">
+                              ${(entry.sources || []).map((source) => `
+                                <div class="source-pill">
+                                  <strong>${source.name} (${source.code})</strong>
+                                  <span>持仓 ${formatDetailPct(source.weight_pct, 1)}</span>
+                                  <span>股票日涨跌 ${formatDetailPct(source.daily_return_pct, 3)}</span>
+                                  <span>贡献 ${formatDetailPct(source.contribution_pct, 3)}</span>
+                                </div>
+                              `).join("")}
+                            </div>
+                          </td>
+                        </tr>
+                      `).join("") || `<tr><td colspan="4">暂无逐日收益明细</td></tr>`}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderHero() {
+        document.getElementById("title").textContent = data.meta.title;
+        document.getElementById("subtitle").textContent = `${data.meta.subtitle}。${data.meta.user_hint}`;
+        document.getElementById("asOfPill").textContent = `截至 ${data.meta.as_of}`;
+        document.getElementById("sourcePill").textContent = `数据源 ${data.meta.data_source}`;
+        document.getElementById("watchPill").textContent = `${data.meta.watch_group_label} · 当前已加载 ${data.meta.universe_size} 只`;
+        document.getElementById("rebalancePill").textContent = data.meta.rebalance_cycle;
+        document.getElementById("planTitle").textContent = data.hero.plan_title;
+        document.getElementById("planName").textContent = data.hero.plan_name;
+        document.getElementById("planSummary").textContent = data.hero.plan_summary;
+        document.getElementById("regimePill").textContent = data.hero.market_regime;
+        document.getElementById("headlinePill").textContent = data.hero.headline;
+        document.getElementById("deskStatus").textContent = data.hero.desk_status;
+        document.getElementById("controlRegime").textContent = data.hero.market_regime;
+        document.getElementById("controlHeadline").textContent = data.hero.headline;
+        document.getElementById("controlPlanName").textContent = data.hero.plan_name;
+        const defaultModel = data.strategy_models.find((item) => item.name === data.hero.plan_name) || data.strategy_models[0];
+        document.getElementById("controlPlanFit").textContent = defaultModel ? `${defaultModel.fit} · ${defaultModel.risk}` : data.hero.plan_summary;
+        document.getElementById("controlDataSource").textContent = data.meta.data_source;
+        document.getElementById("controlRefreshStatus").textContent = cacheModeText(data._cache);
+        document.getElementById("globalCapitalInput").value = globalCapital;
+      }
+
+      function renderQuickGuide() {
+        const defaultModel = data.strategy_models.find((item) => item.name === data.hero.plan_name) || data.strategy_models[0] || {};
+        const intelligence = data.strategy_intelligence || {};
+        const executionStack = data.execution_stack || {};
+        const lookList = [
+          "先看当前执行结论，确认今天股票主执行策略和市场状态。",
+          "再看“股票实时行情跑马道”和“盘中战术覆盖层”，判断有没有高抛低吸机会。",
+          "最后看“明日计划”和策略比较，决定明天是否延续主策略或切换备选。",
+        ];
+        document.getElementById("quickIntroTitle").textContent = "股票长短结合页";
+        document.getElementById("quickIntroCopy").textContent = "这页把股票主策略、实时行情、盘中战术层和明日计划放在一起，适合同时看长期交易和短期博取机会。";
+        document.getElementById("quickLookList").innerHTML = `<ol class="quickstart-list">${lookList.map((item) => `<li>${item}</li>`).join("")}</ol>`;
+        document.getElementById("quickDecisionTitle").textContent = data.hero.plan_name || "--";
+        document.getElementById("quickDecisionCopy").textContent = `${data.hero.market_regime || "--"} · ${data.hero.headline || "--"}。${data.hero.plan_summary || data.hero.desk_status || "--"}${executionStack.tactical_layer?.name ? ` 当前战术层：${executionStack.tactical_layer.name}` : ""}`;
+        document.getElementById("quickPerformanceTitle").textContent = strategyPerformanceValue(defaultModel);
+        document.getElementById("quickPerformanceCopy").textContent = `今年以来 ${formatSigned(defaultModel.ytd_return, 1)} / 回撤参考 ${strategyDrawdownHint(defaultModel)}。样本外体检：${intelligence.validation?.summary || "--"}`;
+      }
+
+      function renderTicker() {
+        const baseTape = data.ticker_tape || [];
+        const tape = [...baseTape, ...baseTape];
+        document.getElementById("tickerTrack").innerHTML = tape.map((item) => `
+          <div class="ticker-item">
+            <strong>${item.name}</strong>
+            <span>${item.code}</span>
+            <span>${formatPrice(item.last_price)}</span>
+            <span class="${toneClass(item.change_pct)}">${formatPct(item.change_pct)}</span>
+            <span>${item.signal}</span>
+            <span>${item.realtime_tag || "iFinD 实时"}${item.trade_time ? ` · ${item.trade_time}` : ""}</span>
+          </div>
+        `).join("");
+      }
+
+      function renderMetrics() {
+        const coverage = data.strategy_intelligence?.coverage || {};
+        const stats = [
+          ["策略收益", formatSigned(data.stats.since_start_return), `自 ${data.stats.since_start_date} 起累计`],
+          ["今年以来", formatSigned(data.stats.ytd_return), `自 ${data.stats.ytd_start_date || "--"} 起`],
+          ["最大回撤", formatSigned(data.stats.max_drawdown), "策略历史最大回撤"],
+          ["胜率", formatSigned(data.stats.hit_rate), "下一周期预估命中率"],
+          ["信号温度", `${data.stats.signal_score}`, "当前量化综合强度"],
+          ["实时覆盖", `${data.stats.live_coverage}%`, "已接入 iFinD 实时的股票比例"],
+          ["历史底表", `${coverage.cached_history ?? data.stats.history_cached_count ?? "--"} 只`, "本地已缓存、后续可直接训练的股票历史样本"],
+          ["进入测算", `${coverage.measured_count ?? data.stats.measured_count ?? "--"} / ${coverage.total_universe ?? data.meta.universe_size ?? "--"}`, "当前真实进入量化测算 / 全市场规模"],
+          ["实时上下文", `${coverage.realtime_context_count ?? data.stats.realtime_context_count ?? "--"} 只`, "盘中高抛低吸和战术层依赖的实时样本数"],
+          ["策略数", `${data.strategy_models.length} 套`, "可直接横向比较"],
+          ["核心候选", `${data.meta.selected_count} 只`, "进入首页监控表的股票数量"],
+          ["资讯触发", `${data.news_flash.length} 条`, "盘中值得看的事件与提示"],
+        ];
+        document.getElementById("metricGrid").innerHTML = stats.map(([name, number, note]) => `
+          <div class="metric">
+            <div class="name">${name}</div>
+            <div class="number">${number}</div>
+            <div class="fund-meta">${note}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderGovernance() {
+        const governance = data.strategy_governance || {};
+        const intelligence = data.strategy_intelligence || {};
+        const executionStack = data.execution_stack || {};
+        const rec = governance.recommendation || {};
+        const coverage = governance.coverage_summary || {};
+        const switchPlan = governance.switch_plan || {};
+        const challengerText = (governance.challengers || []).map((item) => item.name).join(" / ") || "--";
+        const cards = [
+          ["当前主执行", rec.name || "--", rec.signal_label || rec.status || "--"],
+          ["治理评分", rec.governance_score ?? "--", rec.rebalance_hint || "--"],
+          ["滚动稳定性", rec.stability_score ?? "--", `63 日胜率 ${rec.rolling_63_win_rate ?? "--"}% / 126 日胜率 ${rec.rolling_126_win_rate ?? "--"}%`],
+          ["测算覆盖", `${intelligence.coverage?.measured_count ?? coverage.candidate_count ?? "--"} / ${intelligence.coverage?.total_universe ?? coverage.total_universe ?? "--"}`, "当前进入量化测算 / 全市场规模"],
+          ["双层执行", `${executionStack.core_layer?.name || "--"} + ${executionStack.tactical_layer?.name || "--"}`, `主仓约 ${100 - (executionStack.tactical_budget_pct ?? 0)}% / 战术约 ${executionStack.tactical_budget_pct ?? "--"}%`],
+        ];
+        document.getElementById("governanceGrid").innerHTML = cards.map(([label, value, detail]) => `
+          <div class="monitor-card">
+            <div class="section-label">${label}</div>
+            <div class="value">${value}</div>
+            <p>${detail}</p>
+          </div>
+        `).join("");
+        document.getElementById("governanceList").innerHTML = [
+          { title: "主执行原因", summary: rec.signal_reason || rec.rebalance_hint || "--" },
+          { title: "切换结论", summary: `${switchPlan.action || "--"}。${switchPlan.summary || ""}` },
+          { title: "市场阶段", summary: `${intelligence.market_regime?.label || "--"}。${intelligence.market_regime?.summary || ""}` },
+          { title: "因子主线", summary: `${intelligence.factor_insights?.headline || "--"} ${intelligence.factor_insights?.summary || ""}` },
+          { title: "样本外体检", summary: intelligence.validation?.summary || "--" },
+          { title: "次优候选", summary: challengerText },
+          { title: "双层执行结构", summary: executionStack.summary || "--" },
+          { title: "战术层触发", summary: (executionStack.triggers || []).join("；") || "--" },
+          { title: "换手与风险", summary: `近 20 日平均换手 ${rec.avg_turnover ?? "--"}%，年化波动 ${rec.annual_vol ?? "--"}%，Calmar ${rec.calmar_like ?? "--"}，最差 63 日 ${formatSigned(rec.worst_63_return, 1)}` },
+          { title: "失效切换条件", summary: (switchPlan.triggers || []).join("；") || "--" },
+          ...(governance.next_focus || []).map((text, index) => ({ title: `下一步 ${index + 1}`, summary: text })),
+        ].map((item) => `
+          <div class="news-item">
+            <div class="news-top">
+              <span>策略总控</span>
+              <span>${rec.name || "--"}</span>
+            </div>
+            <h4 style="margin:0 0 8px;">${item.title}</h4>
+            <p>${item.summary}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderTrainingPriority() {
+        const priority = data.training_priority || {};
+        const measuredRows = priority.top_rows || [];
+        const discoveryRows = priority.discovery_rows || [];
+        const cards = [
+          ["已测算层待补", `${priority.measured_missing_count ?? 0} 只`, "已经进入股票主台候选层，但还缺历史日线，补齐后能更完整参与回测和评分。"],
+          ["全市场发现层待补", `${priority.discovery_missing_count ?? 0} 只`, "全市场里还没进入股票主台测算层、但后续应该继续补历史的发现层样本。"],
+          ["历史底表", `${priority.cached_count ?? "--"} 只`, "本地已落库、后续可直接训练和回测的股票历史样本。"],
+          ["当前动作", measuredRows.length ? `先补 ${measuredRows.length} 只` : `转向发现层 ${discoveryRows.length} 只`, priority.summary || "--"],
+        ];
+        document.getElementById("trainingPriorityGrid").innerHTML = cards.map(([label, value, detail]) => `
+          <div class="monitor-card">
+            <div class="section-label">${label}</div>
+            <div class="value">${value}</div>
+            <p>${detail}</p>
+          </div>
+        `).join("");
+        const queue = measuredRows.length ? measuredRows : discoveryRows;
+        document.getElementById("trainingPriorityList").innerHTML = queue.map((item, index) => `
+          <div class="news-item">
+            <div class="news-top">
+              <span>扩容优先 ${index + 1}</span>
+              <span>${item.sector || "股票样本"}</span>
+            </div>
+            <h4 style="margin:0 0 8px;">${item.name} (${item.code})</h4>
+            <p><strong>当前分数：</strong>${item.priority_score ?? item.base_score ?? "--"}</p>
+            <p>${item.reason || "--"}</p>
+          </div>
+        `).join("") || `
+          <div class="news-item">
+            <div class="news-top"><span>扩容优先</span><span>当前无新增</span></div>
+            <h4 style="margin:0 0 8px;">当前股票测算层样本已覆盖</h4>
+            <p>${priority.summary || "后续继续转向全市场发现层补库。"}</p>
+          </div>
+        `;
+      }
+
+      function renderIntradayTraining() {
+        const training = data.intraday_training || {};
+        const summary = training.summary || {};
+        const cards = [
+          ["训练观察", `${summary.observation_count ?? 0} 条`, "每条观察对应一次盘中状态和下一快照结果，用来训练动作胜率。"],
+          ["已标注样本", `${summary.labeled_count ?? 0} 条`, "已经能计算下一快照收益的样本数，越多越适合校准盘中动作。"],
+          ["可执行动作", `${summary.actionable_count ?? 0} 条`, "最近样本里真正出现低吸、突破或高抛信号的次数。"],
+          ["当前最优动作", summary.best_action || "--", summary.focus || "--"],
+          ["快照份数", `${summary.snapshot_count ?? 0} 份`, "最近纳入训练样本库的日内快照数量。"],
+          ["最近快照", summary.latest_snapshot_at || "--", summary.coverage_text || "--"],
+        ];
+        document.getElementById("intradayTrainingGrid").innerHTML = cards.map(([label, value, detail]) => `
+          <div class="monitor-card">
+            <div class="section-label">${label}</div>
+            <div class="value">${value}</div>
+            <p>${detail}</p>
+          </div>
+        `).join("");
+        const actionStats = (training.action_stats || []).map((item) => ({
+          title: `${item.action} · ${item.count} 次`,
+          summary: `命中率 ${item.hit_rate_pct ?? "--"}% · 动作边际 ${formatSigned(item.avg_action_edge_pct, 2)} · 下一快照平均 ${formatSigned(item.avg_next_return_pct, 2)}`,
+          tag: "动作统计",
+        }));
+        const latestSignals = (training.latest_signals || []).map((item) => ({
+          title: `${item.name || "--"} (${item.code || "--"})`,
+          summary: `${item.action || "--"} · 信心 ${item.confidence_score ?? "--"} 分 · 位置 ${item.range_pos_pct ?? "--"}% · ${item.reason || "--"}`,
+          tag: "当前信号",
+        }));
+        const rules = (training.rules || []).slice(0, 2).map((item) => ({
+          title: "执行规则",
+          summary: item,
+          tag: "规则",
+        }));
+        const feed = [...actionStats, ...latestSignals, ...rules];
+        document.getElementById("intradayTrainingList").innerHTML = feed.map((item) => `
+          <div class="news-item">
+            <div class="news-top">
+              <span>${item.tag}</span>
+              <span>盘中训练</span>
+            </div>
+            <h4 style="margin:0 0 8px;">${item.title}</h4>
+            <p>${item.summary}</p>
+          </div>
+        `).join("") || `
+          <div class="news-item">
+            <div class="news-top"><span>盘中训练</span><span>样本待积累</span></div>
+            <h4 style="margin:0 0 8px;">还需要更多交易时段快照</h4>
+            <p>当前会先持续收集实时快照，等样本变厚后再用来更稳地校准盘中动作。</p>
+          </div>
+        `;
+      }
+
+      function renderIntradayOverlay() {
+        const overlay = data.intraday_overlay || {};
+        const summary = overlay.summary || {};
+        document.getElementById("intradayOverlaySummary").textContent = `${summary.strategy_name || "--"} · ${summary.bias || "--"} · ${summary.data_status || "--"}`;
+        const cards = [
+          ["战术偏向", summary.bias || "--", summary.switch_note || "--"],
+          ["低吸信号", `${summary.buy_signals ?? 0}`, "用于回踩承接后的试探加仓"],
+          ["高抛信号", `${summary.sell_signals ?? 0}`, "用于冲高回落后的收益保护"],
+          ["数据状态", summary.data_status || "--", "实时快照覆盖度越高，盘中判断越可靠"],
+          ["执行说明", summary.confidence_hint || "--", "优先执行信心分更高、落在支撑带或突破带附近的动作"],
+        ];
+        document.getElementById("intradayOverlayGrid").innerHTML = cards.map(([label, value, detail]) => `
+          <div class="monitor-card">
+            <div class="section-label">${label}</div>
+            <div class="value">${value}</div>
+            <p>${detail}</p>
+          </div>
+        `).join("");
+        document.getElementById("intradayOverlayBody").innerHTML = (overlay.rows || []).map((row) => `
+          <tr>
+            <td data-label="股票">
+              <div class="fund-name">${row.name || "--"}</div>
+              <div class="fund-meta">${row.code || "--"} · ${row.sector || "--"}</div>
+            </td>
+            <td data-label="状态">
+              <div>${row.is_position ? "当前持仓" : "观察候选"}</div>
+              <div class="fund-meta">${row.trade_time || "--"}</div>
+            </td>
+            <td data-label="动作"><span class="badge ${signalClass(row.action)}">${row.action || "--"}</span></td>
+            <td data-label="调整">${row.adjust_pct > 0 ? "+" : ""}${(row.adjust_pct ?? 0).toFixed(1)}%</td>
+            <td data-label="信心">${row.confidence_score ?? "--"} 分</td>
+            <td data-label="盘中位置">
+              <div>${row.range_pos_pct ?? "--"}%</div>
+              <div class="fund-meta">距高点 ${formatSigned(row.retreat_from_high_pct, 2)} · 自低点 ${formatSigned(row.rebound_from_low_pct, 2)}</div>
+            </td>
+            <td data-label="原因">
+              <div>${row.reason || "--"}</div>
+              <div class="fund-meta">执行带 ${row.execution_band || "--"}</div>
+              <div class="fund-meta">涨跌 ${formatSigned(row.change_pct, 2)} · 快照动量 ${formatSigned(row.snap_mom_pct, 2)} · 日线趋势 ${formatSigned(row.daily_trend_pct, 2)}</div>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      function renderTabs() {
+        document.getElementById("groupTabs").innerHTML = data.watch_tables.map((group) => `
+          <button class="tab-btn ${group.id === activeGroupId ? "active" : ""}" data-group="${group.id}">${group.name}</button>
+        `).join("");
+        document.querySelectorAll(".tab-btn").forEach((button) => {
+          button.addEventListener("click", () => {
+            activeGroupId = button.dataset.group;
+            renderTabs();
+            renderWatchTable();
+          });
+        });
+      }
+
+      function renderWatchTable() {
+        const group = data.watch_tables.find((item) => item.id === activeGroupId) || data.watch_tables[0];
+        document.getElementById("groupDescription").textContent = group.description;
+        document.getElementById("watchTableBody").innerHTML = group.rows.map((row) => `
+          <tr>
+            <td data-label="股票">
+              <div class="fund-name">${row.name}</div>
+              <div class="fund-meta">${row.code}</div>
+            </td>
+            <td data-label="策略 / 行业">
+              <div>${row.model || row.strategy || "--"}</div>
+              <div class="fund-meta">${row.sector || row.style || "--"}</div>
+            </td>
+            <td data-label="最新价">
+              <div>${formatPrice(row.last_price)}</div>
+              <div class="fund-meta">${row.realtime_tag || "iFinD 实时"}${row.trade_time ? ` · ${row.trade_time}` : ""}</div>
+            </td>
+            <td data-label="涨跌幅" class="${toneClass(row.change_pct)}">${formatPct(row.change_pct)}</td>
+            <td data-label="动作"><span class="badge ${signalClass(row.signal)}">${row.signal || row.action || "持有"}</span></td>
+            <td data-label="目标仓位">${((row.target_weight ?? row.weight ?? 0) * (row.target_weight && row.target_weight > 1 ? 1 : 100)).toFixed(row.target_weight > 1 ? 0 : 1)}${row.target_weight > 1 ? "%" : "%"}</td>
+            <td data-label="备注">
+              <div>${row.plan_action || row.note || row.trigger || "按当前策略跟踪"}</div>
+              <div class="fund-meta">${row.risk_note || row.risk || ""}</div>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      function renderStrategies() {
+        const featured = data.strategy_models.find((item) => item.name === data.hero.plan_name) || data.strategy_models[0];
+        const compare = data.strategy_models;
+
+        document.getElementById("featuredStrategy").innerHTML = featured ? `
+          <div class="strategy-flip" data-flip-card="${featured.id}">
+            <div class="strategy-flip-inner">
+              <div class="spotlight-card strategy-face front flip-front-shell">
+                <div class="flip-head">
+                  <div>
+                    <div class="section-label" style="color:rgba(248,241,231,0.68);">${featured.badge}</div>
+                    <h4>${featured.name}</h4>
+                  </div>
+                  <div class="flip-actions">
+                    <span class="badge spotlight-badge">${featured.status}</span>
+                    <button class="ghost-btn" type="button" data-flip-toggle="${featured.id}">查看策略</button>
+                  </div>
+                </div>
+                <div class="flip-copy">${featured.summary}</div>
+                <div class="summary-metrics">
+                  <div class="summary-metric">
+                    <div class="label">当前策略收益</div>
+                    <div class="value">${strategyPerformanceValue(featured)}</div>
+                    <div class="note">自 ${featured.backtest_start_date || data.stats.since_start_date || "--"} 起</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">今年以来</div>
+                    <div class="value">${formatSigned(featured.ytd_return, 1)}</div>
+                    <div class="note">自 ${featured.ytd_start_date || data.stats.ytd_start_date || "--"} 起</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">最大回撤</div>
+                    <div class="value">${strategyDrawdownHint(featured)}</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">当前状态</div>
+                    <div class="value">${featured.status}</div>
+                  </div>
+                </div>
+                <div class="calc-shell" style="margin-top:16px;">
+                  <div class="calc-top">
+                    <div>
+                      <div class="section-label">Position Sizing</div>
+                      <div class="calc-note">每套策略支持独立金额，不会再互相覆盖。需要时也可以一键回填全局金额。</div>
+                    </div>
+                    <label class="calc-input">
+                      <span>本策略金额</span>
+                      <input type="number" min="0" step="1000" value="${capitalByStrategy[featured.id] ?? globalCapital}" data-featured-capital-input="${featured.id}" />
+                    </label>
+                    <button class="ghost-btn" type="button" data-apply-global="${featured.id}">使用全局金额</button>
+                  </div>
+                  <div class="calc-grid" id="featuredCalcSummary-${featured.id}"></div>
+                  <div class="calc-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>股票</th>
+                          <th>目标仓位</th>
+                          <th>目标金额</th>
+                          <th>参考现持</th>
+                          <th>调整金额</th>
+                          <th>动作</th>
+                        </tr>
+                      </thead>
+                      <tbody id="featuredCalcTable-${featured.id}"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-back-shell strategy-face back">
+                <div class="flip-head">
+                  <div>
+                    <div class="section-label">${featured.badge}</div>
+                    <h4>${featured.name}</h4>
+                  </div>
+                  <div class="flip-actions">
+                    <span class="badge spotlight-badge">${featured.status}</span>
+                    <button class="ghost-btn" type="button" data-flip-toggle="${featured.id}">返回测算</button>
+                  </div>
+                </div>
+                <div class="flip-back-copy">${featured.fit} · ${featured.risk}</div>
+                ${renderStrategyDetail(featured, colors[0])}
+              </div>
+            </div>
+          </div>
+        ` : "";
+
+        document.getElementById("strategySummaryStrip").innerHTML = compare.map((model) => `
+          <div class="strategy-summary-card">
+            <div class="section-label">${model.badge}</div>
+            <h4>${model.name}</h4>
+            <div class="strategy-summary-copy">${model.fit} · 当前信号 ${model.signal_label || model.status || "--"}</div>
+            <div class="summary-metrics">
+              <div class="summary-metric">
+                <div class="label">收益</div>
+                <div class="value">${strategyPerformanceValue(model)}</div>
+                <div class="note">自 ${model.backtest_start_date || data.stats.since_start_date || "--"} 起</div>
+              </div>
+              <div class="summary-metric">
+                <div class="label">今年以来</div>
+                <div class="value">${formatSigned(model.ytd_return, 1)}</div>
+                <div class="note">自 ${model.ytd_start_date || data.stats.ytd_start_date || "--"} 起</div>
+              </div>
+              <div class="summary-metric">
+                <div class="label">回撤</div>
+                <div class="value">${strategyDrawdownHint(model)}</div>
+              </div>
+              <div class="summary-metric">
+                <div class="label">状态</div>
+                <div class="value">${model.status}</div>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        document.getElementById("strategyGrid").innerHTML = compare.map((model) => `
+          <div class="strategy-flip" data-flip-card="${model.id}">
+            <div class="strategy-flip-inner">
+              <div class="strategy-card strategy-face front flip-front-shell">
+                <div class="flip-head">
+                  <div>
+                    <div class="section-label">${model.badge}</div>
+                    <h4>${model.name}</h4>
+                  </div>
+                  <div class="flip-actions">
+                    <span class="badge">${model.status}</span>
+                    <button class="ghost-btn" type="button" data-flip-toggle="${model.id}">查看策略</button>
+                  </div>
+                </div>
+                <p class="flip-copy">${model.summary}</p>
+                <div class="fund-meta">${model.fit} · ${model.risk}</div>
+                <div class="summary-metrics">
+                  <div class="summary-metric">
+                    <div class="label">当前策略收益</div>
+                    <div class="value">${strategyPerformanceValue(model)}</div>
+                    <div class="note">自 ${model.backtest_start_date || data.stats.since_start_date || "--"} 起</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">今年以来</div>
+                    <div class="value">${formatSigned(model.ytd_return, 1)}</div>
+                    <div class="note">自 ${model.ytd_start_date || data.stats.ytd_start_date || "--"} 起</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">最大回撤</div>
+                    <div class="value">${strategyDrawdownHint(model)}</div>
+                  </div>
+                  <div class="summary-metric">
+                    <div class="label">当前状态</div>
+                    <div class="value">${model.status}</div>
+                  </div>
+                </div>
+                <div class="calc-shell">
+                  <div class="calc-top">
+                    <div>
+                      <div class="section-label">Position Sizing</div>
+                      <div class="calc-note">每套策略支持独立金额，不会再互相覆盖。需要时也可以一键回填全局金额。</div>
+                    </div>
+                    <label class="calc-input">
+                      <span>本策略金额</span>
+                      <input type="number" min="0" step="1000" value="${capitalByStrategy[model.id] ?? globalCapital}" data-capital-input="${model.id}" />
+                    </label>
+                    <button class="ghost-btn" type="button" data-apply-global="${model.id}">使用全局金额</button>
+                  </div>
+                  <div class="calc-grid" id="calcSummary-${model.id}"></div>
+                  <div class="calc-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>股票</th>
+                          <th>目标仓位</th>
+                          <th>目标金额</th>
+                          <th>参考现持</th>
+                          <th>调整金额</th>
+                          <th>动作</th>
+                        </tr>
+                      </thead>
+                      <tbody id="calcTable-${model.id}"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-back-shell strategy-face back">
+                <div class="flip-head">
+                  <div>
+                    <div class="section-label">${model.badge}</div>
+                    <h4>${model.name}</h4>
+                  </div>
+                  <div class="flip-actions">
+                    <span class="badge">${model.status}</span>
+                    <button class="ghost-btn" type="button" data-flip-toggle="${model.id}">返回测算</button>
+                  </div>
+                </div>
+                <div class="flip-back-copy">${model.fit} · ${model.risk}</div>
+                ${renderStrategyDetail(model, colors[compare.indexOf(model) % 6])}
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        document.querySelectorAll("[data-featured-capital-input]").forEach((input) => {
+          input.addEventListener("input", () => {
+            capitalByStrategy[input.dataset.featuredCapitalInput] = Math.max(Number(input.value || 0), 0);
+            renderStrategyCalculator(input.dataset.featuredCapitalInput);
+          });
+        });
+
+        document.querySelectorAll("[data-capital-input]").forEach((input) => {
+          input.addEventListener("input", () => {
+            capitalByStrategy[input.dataset.capitalInput] = Math.max(Number(input.value || 0), 0);
+            renderStrategyCalculator(input.dataset.capitalInput);
+          });
+        });
+
+        document.querySelectorAll("[data-apply-global]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const id = button.dataset.applyGlobal;
+            capitalByStrategy[id] = globalCapital;
+            const input = document.querySelector(`[data-capital-input="${id}"]`);
+            if (input) input.value = globalCapital;
+            const featuredInput = document.querySelector(`[data-featured-capital-input="${id}"]`);
+            if (featuredInput) featuredInput.value = globalCapital;
+            renderStrategyCalculator(id);
+          });
+        });
+
+        data.strategy_models.forEach((model) => renderStrategyCalculator(model.id));
+
+        document.querySelectorAll("[data-flip-toggle]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const id = button.dataset.flipToggle;
+            const card = document.querySelector(`.strategy-flip[data-flip-card="${id}"]`);
+            if (!card) return;
+            card.classList.toggle("is-flipped");
+          });
+        });
+      }
+
+      function renderStrategyCalculator(modelId) {
+        const model = data.strategy_models.find((item) => item.id === modelId);
+        if (!model) return;
+        const input = document.querySelector(`[data-capital-input="${modelId}"]`) || document.querySelector(`[data-featured-capital-input="${modelId}"]`);
+        const capital = Math.max(Number(input?.value || capitalByStrategy[modelId] || globalCapital || 0), 0);
+        capitalByStrategy[modelId] = capital;
+        const rows = model.positions || [];
+        let totalTarget = 0;
+        let totalCurrent = 0;
+        let totalAdjust = 0;
+
+        const body = rows.map((row) => {
+          const targetAmount = capital * Number(row.target_weight || 0) / 100;
+          const currentAmount = capital * Number(row.current_weight || 0) / 100;
+          const adjustAmount = targetAmount - currentAmount;
+          totalTarget += targetAmount;
+          totalCurrent += currentAmount;
+          totalAdjust += adjustAmount;
+          return `
+            <tr>
+              <td data-label="股票">
+                <div class="fund-name">${row.name || row.code}</div>
+                <div class="fund-meta">${row.code} · ${row.sector || "--"} · ${formatPrice(row.last_price)}${row.trade_time ? ` · ${row.trade_time}` : ""}</div>
+              </td>
+              <td data-label="目标仓位">${row.target_weight}%</td>
+              <td data-label="目标金额">${formatMoney(targetAmount)}</td>
+              <td data-label="参考现持">${formatMoney(currentAmount)}</td>
+              <td data-label="调整金额" class="${toneClass(adjustAmount)}">${adjustAmount === 0 ? formatMoney(0) : `${adjustAmount > 0 ? "+" : "-"}${formatMoney(Math.abs(adjustAmount))}`}</td>
+              <td data-label="动作"><span class="badge ${signalClass(row.trade_action)}">${row.trade_action}</span></td>
+            </tr>
+          `;
+        }).join("");
+
+        const cashRemain = capital - totalTarget;
+        document.getElementById(`calcTable-${modelId}`).innerHTML = body;
+        document.getElementById(`calcSummary-${modelId}`).innerHTML = `
+          <div class="calc-metric">
+            <div class="label">目标总投入</div>
+            <div class="value">${formatMoney(totalTarget)}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">参考现持</div>
+            <div class="value">${formatMoney(totalCurrent)}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">需调整金额</div>
+            <div class="value ${toneClass(totalAdjust)}">${totalAdjust === 0 ? formatMoney(0) : `${totalAdjust > 0 ? "+" : "-"}${formatMoney(Math.abs(totalAdjust))}`}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">剩余现金缓冲</div>
+            <div class="value">${formatMoney(cashRemain)}</div>
+          </div>
+        `;
+        const featuredTable = document.getElementById(`featuredCalcTable-${modelId}`);
+        const featuredSummary = document.getElementById(`featuredCalcSummary-${modelId}`);
+        if (featuredTable) featuredTable.innerHTML = body;
+        if (featuredSummary) featuredSummary.innerHTML = `
+          <div class="calc-metric">
+            <div class="label">目标总投入</div>
+            <div class="value">${formatMoney(totalTarget)}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">参考现持</div>
+            <div class="value">${formatMoney(totalCurrent)}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">需调整金额</div>
+            <div class="value ${toneClass(totalAdjust)}">${totalAdjust === 0 ? formatMoney(0) : `${totalAdjust > 0 ? "+" : "-"}${formatMoney(Math.abs(totalAdjust))}`}</div>
+          </div>
+          <div class="calc-metric">
+            <div class="label">剩余现金缓冲</div>
+            <div class="value">${formatMoney(cashRemain)}</div>
+          </div>
+        `;
+      }
+
+      function renderMonitors() {
+        document.getElementById("monitorGrid").innerHTML = data.monitor_board.map((item) => `
+          <div class="monitor-card">
+            <div class="section-label">${item.label}</div>
+            <div class="value">${item.value}</div>
+            <p>${item.detail}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderNews() {
+        document.getElementById("newsList").innerHTML = data.news_flash.map((item) => `
+          <div class="news-item">
+            <div class="news-top">
+              <span>${item.time}</span>
+              <span>${item.source} · ${item.impact}</span>
+            </div>
+            <h4 style="margin:0 0 8px;">${item.title}</h4>
+            <p>${item.summary}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderTomorrowPlan() {
+        document.getElementById("tomorrowPlanSummary").textContent = `${data.tomorrow_plan.trade_date} · ${data.tomorrow_plan.bias} · ${data.tomorrow_plan.summary}`;
+        document.getElementById("tomorrowPlanCards").innerHTML = data.tomorrow_plan.candidates.map((item) => `
+          <div class="news-item">
+            <div class="news-top">
+              <span>${item.code} ${item.name}</span>
+              <span class="${toneClass(item.change_pct)}">${item.change_pct !== undefined && item.change_pct !== null ? formatPct(item.change_pct) : "待刷新"}</span>
+            </div>
+            <h4 style="margin:0 0 8px;">${item.action}</h4>
+            <p><strong>最新价：</strong>${item.last_price ?? "--"}</p>
+            <p><strong>买点区间：</strong>${item.buy_zone}</p>
+            <p><strong>触发条件：</strong>${item.trigger}</p>
+            <p><strong>止损：</strong>${item.stop}</p>
+            <p><strong>止盈：</strong>${item.take_profit}</p>
+            <p><strong>备注：</strong>${item.note}</p>
+          </div>
+        `).join("");
+      }
+
+      function buildPolyline(values, min, max, width, height, pad) {
+        const innerWidth = width - pad * 2;
+        const innerHeight = height - pad * 2;
+        return values.map((value, index) => {
+          const x = pad + (innerWidth * index) / Math.max(values.length - 1, 1);
+          const ratio = (value - min) / Math.max(max - min, 1);
+          const y = height - pad - ratio * innerHeight;
+          return `${x},${y}`;
+        }).join(" ");
+      }
+
+      function renderChart() {
+        const chart = document.getElementById("perfChart");
+        const width = 720;
+        const height = 280;
+        const pad = 24;
+        const values = data.performance.series.flatMap((item) => item.values);
+        const min = Math.min(...values, 0);
+        const max = Math.max(...values, 1);
+        const labels = data.performance.labels;
+
+        document.getElementById("perfSub").textContent = `起始日 ${data.performance.start_date}，已内置 ${data.performance.series.length} 套策略/基准对照。`;
+        document.getElementById("legend").innerHTML = data.performance.series.map((item, index) => {
+          const isBaseline = item.name.includes("等权基准");
+          const color = isBaseline ? "#5e6472" : colors[index % 6];
+          const style = isBaseline ? `border-top: 3px dashed ${color};` : `border-top: 3px solid ${color};`;
+          return `<span class="legend-item"><span class="line-swatch" style="${style}"></span>${item.name}</span>`;
+        }).join("");
+
+        const gridLines = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+          const y = height - pad - ratio * (height - pad * 2);
+          return `<line x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}" stroke="rgba(24,36,51,0.08)" stroke-width="1" />`;
+        }).join("");
+
+        const xLabels = labels.map((label, index) => {
+          const x = pad + ((width - pad * 2) * index) / Math.max(labels.length - 1, 1);
+          return `<text x="${x}" y="${height - 4}" text-anchor="middle" font-size="11" fill="#607080">${label}</text>`;
+        }).join("");
+
+        const yLabels = [min, (min + max) / 2, max].map((value, index) => {
+          const ratio = index / 2;
+          const y = height - pad - ratio * (height - pad * 2);
+          return `<text x="6" y="${y + 4}" font-size="11" fill="#607080">${value.toFixed(1)}%</text>`;
+        }).join("");
+
+        const lines = data.performance.series.map((item, index) => {
+          const points = buildPolyline(item.values, min, max, width, height, pad);
+          const isBaseline = item.name.includes("等权基准");
+          const color = isBaseline ? "#5e6472" : colors[index % 6];
+          return `<polyline fill="none" stroke="${color}" stroke-width="${isBaseline ? 2.6 : 3.2}" stroke-dasharray="${isBaseline ? "10 7" : ""}" stroke-linecap="round" stroke-linejoin="round" points="${points}" />`;
+        }).join("");
+
+        chart.innerHTML = `${gridLines}${xLabels}${yLabels}${lines}`;
+      }
+
+      function renderAll() {
+        if (!data) return;
+        if (!data.watch_tables.find((item) => item.id === activeGroupId)) {
+          activeGroupId = data.watch_tables[0]?.id || "all";
+        }
+        renderHero();
+        renderQuickGuide();
+        renderTicker();
+        renderTabs();
+        renderWatchTable();
+        renderStrategies();
+        renderGovernance();
+        renderTrainingPriority();
+        renderIntradayTraining();
+        renderMetrics();
+        renderMonitors();
+        renderIntradayOverlay();
+        renderTomorrowPlan();
+        renderNews();
+        renderChart();
+        bindGlobalControls();
+      }
+
+      function syncCapitalDefault(value) {
+        globalCapital = Math.max(Number(value || 0), 0);
+      }
+
+      function bindGlobalControls() {
+        const globalInput = document.getElementById("globalCapitalInput");
+        if (globalInput && !globalInput.dataset.bound) {
+          globalInput.dataset.bound = "1";
+          globalInput.addEventListener("input", () => syncCapitalDefault(globalInput.value));
+        }
+        const refreshButton = document.getElementById("manualRefreshBtn");
+        if (refreshButton && !refreshButton.dataset.bound) {
+          refreshButton.dataset.bound = "1";
+          refreshButton.addEventListener("click", async () => {
+            refreshButton.disabled = true;
+            setRefreshStatus("正在强制刷新…", false);
+            try {
+              await loadData(true);
+            } finally {
+              refreshButton.disabled = false;
+            }
+          });
+        }
+      }
+
+      async function loadData(force = false) {
+        const suffix = force ? "?force=1" : `?ts=${Date.now()}`;
+        const response = await fetch(`/api/stock-board-data${suffix}`, { cache: "no-store" });
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.message || payload.error || `HTTP ${response.status}`);
+        }
+        data = await response.json();
+        refreshDeadline = Date.now() + refreshMs;
+        document.getElementById("footerNote").textContent = `股票看板当前使用服务端缓存刷新。${cacheModeText(data._cache)}。`;
+        renderAll();
+        updateCountdown();
+      }
+
+      function updateCountdown() {
+        if (!refreshDeadline || refreshErrorActive) return;
+        const remain = Math.max(0, Math.ceil((refreshDeadline - Date.now()) / 1000));
+        const cacheText = data?._cache ? `${cacheModeText(data._cache)} · ` : "";
+        setRefreshStatus(`${cacheText}下次自动刷新 ${remain}s`, false);
+        const controlNode = document.getElementById("controlRefreshStatus");
+        if (controlNode) {
+          controlNode.textContent = `${cacheText}下次 ${remain}s`;
+        }
+      }
+
+      function startAutoRefresh() {
+        clearInterval(refreshTimer);
+        clearInterval(countdownTimer);
+        refreshTimer = window.setInterval(async () => {
+          try {
+            await loadData();
+          } catch (error) {
+            setRefreshStatus(`刷新失败：${error.message}`, true);
+          }
+        }, refreshMs);
+        countdownTimer = window.setInterval(updateCountdown, 1000);
+      }
+
+      async function init() {
+        try {
+          await loadData();
+        } catch (error) {
+          setRefreshStatus("刷新失败", true);
+          document.getElementById("footerNote").textContent = `刷新失败：${error.message}。请通过 http://127.0.0.1:8765/stock-board 打开，并确认本地服务已启动。`;
+        }
+        startAutoRefresh();
+      }
+
+      init();
+    </script>
+  </body>
+</html>
